@@ -21,7 +21,7 @@ namespace MatchBox
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<MatchBoxContext>(opt =>
-               opt.UseInMemoryDatabase("MatchBox"));
+               opt.UseSqlServer(Configuration.GetConnectionString(MatchBoxContext.DbConnectionName)));
 
             services.AddControllers();
 
