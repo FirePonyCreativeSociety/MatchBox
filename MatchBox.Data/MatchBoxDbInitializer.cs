@@ -23,11 +23,8 @@ namespace MatchBox.Db
             await context.AddRangeAsync(defGroups);
 
             // Adds the default users (this includes the admin user)
-            var users = GenerateDefaultUsers(context, defGroups);
+            var users = GenerateDefaultUsersAndGroupLinks(context, defGroups);
             await context.AddRangeAsync(users);
-
-            // Link users and groups
-            LinkDefaultGroupsAndUsers(users, defGroups);
 
             // Commits
             await context.SaveChangesAsync();
@@ -41,7 +38,7 @@ namespace MatchBox.Db
         const string MetaUserName = "Meta";
         const string GrinsUserName = "Grins";
 
-        static IEnumerable<User> GenerateDefaultUsers(MatchBoxDbContext context, IEnumerable<Group> defaultGroups)
+        static IEnumerable<User> GenerateDefaultUsersAndGroupLinks(MatchBoxDbContext context, IEnumerable<Group> defaultGroups)
         {
             var g_admin = defaultGroups.Single(g => g.Name == AdminGroupName);
             var g_sonofabit = defaultGroups.Single(g => g.Name == SonOfABitGroupName);
@@ -115,18 +112,18 @@ namespace MatchBox.Db
             grins.UserGroups.Add(new UserGroup { Group = g_sanct });
             grins.UserGroups.Add(new UserGroup { Group = g_moder });
 
-            // Bunch of other random users
-            for (int i = 0; i < 300; i++)
-            {
-                var strId = i.ToString("D3");
-                list.Add(new User
-                {
-                    UserName = $"User{strId}",
-                    Email = $"emailOfUser{strId}@noserver.net",
-                    FirstName = "User",
-                    LastName = strId,
-                });
-            }
+            //// Bunch of other random users
+            //for (int i = 0; i < 300; i++)
+            //{
+            //    var strId = i.ToString("D3");
+            //    list.Add(new User
+            //    {
+            //        UserName = $"User{strId}",
+            //        Email = $"emailOfUser{strId}@noserver.net",
+            //        FirstName = "User",
+            //        LastName = strId,
+            //    });
+            //}
 
             return list;
         }
@@ -174,23 +171,23 @@ namespace MatchBox.Db
             return list;
         }
 
-        static void LinkDefaultGroupsAndUsers(IEnumerable<User> users, IEnumerable<Group> groups)
-        {
-            //var u_admin = users.Single(u => u.UserName == MatchBoxDbContext.AdminUserName);
-            var u_alef = users.Single(u => u.UserName==AleFUserName);
-            var u_zac = users.Single(u => u.UserName == ZacUserName);                        
-            var u_mrk = users.Single(u => u.UserName == MrKUserName);
-            var u_meta = users.Single(u => u.UserName == MetaUserName);
-            var u_grins = users.Single(u => u.UserName == GrinsUserName);
-
-            var g_admin = groups.Single(g => g.Name == AdminGroupName);
-            var g_sonofabit = groups.Single(g => g.Name == SonOfABitGroupName);
-            var g_edmcafe = groups.Single(g => g.Name == SonOfABitGroupName);
-            var g_sanct = groups.Single(g => g.Name == SonOfABitGroupName);
-            var g_rangers = groups.Single(g => g.Name == ModerangersGroupName);
-
-
-        }
+        //static void LinkDefaultGroupsAndUsers(IEnumerable<User> users, IEnumerable<Group> groups)
+        //{
+        //    //var u_admin = users.Single(u => u.UserName == MatchBoxDbContext.AdminUserName);
+        //    var u_alef = users.Single(u => u.UserName==AleFUserName);
+        //    var u_zac = users.Single(u => u.UserName == ZacUserName);                        
+        //    var u_mrk = users.Single(u => u.UserName == MrKUserName);
+        //    var u_meta = users.Single(u => u.UserName == MetaUserName);
+        //    var u_grins = users.Single(u => u.UserName == GrinsUserName);
+        //
+        //    var g_admin = groups.Single(g => g.Name == AdminGroupName);
+        //    var g_sonofabit = groups.Single(g => g.Name == SonOfABitGroupName);
+        //    var g_edmcafe = groups.Single(g => g.Name == SonOfABitGroupName);
+        //    var g_sanct = groups.Single(g => g.Name == SonOfABitGroupName);
+        //    var g_rangers = groups.Single(g => g.Name == ModerangersGroupName);
+        //
+        //
+        //}
 
         #endregion        
     }

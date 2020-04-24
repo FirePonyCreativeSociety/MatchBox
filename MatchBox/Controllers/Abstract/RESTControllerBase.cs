@@ -21,27 +21,43 @@ namespace MatchBox.Controllers
 
         public MatchBoxDbContext Context { get; }
 
+        protected async Task<T> FindById(int id)
+        {
+            return await Context.FindAsync(typeof(T), id) as T;            
+        }
+
         [HttpPost()]
         public async Task<ActionResult<T>> Create(T value)
         {
             Context.Add(value);
             await Context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(Get), new { id = value.Id}, value);
+            return CreatedAtAction(nameof(GetById), new { id = value.Id }, value);
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<T>> Update(long id, T value)
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<T>> Delete(int id)
         {
-            return NotFound();
+            var tmp = await FindById(id);
+
+            if (tmp != null)
+                return NotFound();
+
+            Context.Remove(tmp);
+            await Context.SaveChangesAsync();
+
+            return tmp;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<T>> Get(long id)
+        public async Task<ActionResult<T>> GetById(int id)
         {
-            return NotFound();
-        }
+            var tmp = await FindById(id);
 
-        
+            if (tmp != null) 
+                return tmp; 
+            else 
+                return NotFound();
+        }        
     }
 }
