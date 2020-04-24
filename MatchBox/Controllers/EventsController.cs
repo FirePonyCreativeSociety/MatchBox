@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MatchBox.Controllers
 {
-    public class EventLogsController : RESTControllerBase<EventLog>
+    public class EventsController : RESTControllerBase<Event>
     {
-        public EventLogsController(MatchBoxContext context)
+        public EventsController(MatchBoxDbContext context)
             : base(context)
         {
 

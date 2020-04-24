@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MatchBox.Contracts
 {
-    public class EventLog : EntityBase
+    public class Event : EntityBase
     {
     }
 }

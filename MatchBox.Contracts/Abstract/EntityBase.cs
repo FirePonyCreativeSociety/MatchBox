@@ -6,6 +6,6 @@ namespace MatchBox.Contracts
 {
     public abstract class EntityBase
     {
-        public long Id { get; set; }
+        public int Id { get; set; }
     }
 }

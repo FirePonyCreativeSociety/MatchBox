@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MatchBox.Contracts\MatchBox.Contracts.csproj" />
+    <ProjectReference Include="..\MatchBox.Data\MatchBox.Data.csproj" />
   </ItemGroup>
 
 

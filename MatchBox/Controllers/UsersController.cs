@@ -10,7 +10,7 @@ namespace MatchBox.Controllers
 {
     public class UsersController : RESTControllerBase<User>
     {
-        public UsersController(MatchBoxContext context)
+        public UsersController(MatchBoxDbContext context)
             : base(context)
         {
 

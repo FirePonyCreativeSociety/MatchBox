@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MatchBox.Controllers
 {
-    public class ThemeCampsController : RESTControllerBase<ThemeCamp>
+    public class GroupsController : RESTControllerBase<Group>
     {
-        public ThemeCampsController(MatchBoxContext context)
+        public GroupsController(MatchBoxDbContext context)
             : base(context)
         {
 

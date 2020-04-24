@@ -13,13 +13,13 @@ namespace MatchBox.Controllers
     public class RESTControllerBase<T> : MatchBoxControllerBase
         where T : EntityBase, new()
     {
-        public RESTControllerBase(MatchBoxContext context)
+        public RESTControllerBase(MatchBoxDbContext context)
             : base()
         {
             Context = context;
         }
 
-        public MatchBoxContext Context { get; }
+        public MatchBoxDbContext Context { get; }
 
         [HttpPost()]
         public async Task<ActionResult<T>> Create(T value)

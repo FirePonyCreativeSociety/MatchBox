@@ -22,7 +22,7 @@ namespace MatchBox
                 var services = scope.ServiceProvider;
                 try
                 {
-                    var context = services.GetRequiredService<MatchBoxContext>();
+                    var context = services.GetRequiredService<MatchBoxDbContext>();
                     context.Initialize().Wait();
                 }
                 catch (Exception ex)
