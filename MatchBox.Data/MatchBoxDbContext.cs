@@ -1,11 +1,7 @@
-﻿using MatchBox.Contracts;
+﻿using MatchBox.Data.Model;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace MatchBox.Db
+namespace MatchBox.Data
 {
     public class MatchBoxDbContext : DbContext
     {
@@ -25,24 +21,24 @@ namespace MatchBox.Db
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserGroup>()
+            modelBuilder.Entity<DbUserGroup>()
                 .HasKey(ug => new { ug.UserId, ug.GroupId });
 
-            modelBuilder.Entity<UserGroup>()
+            modelBuilder.Entity<DbUserGroup>()
                 .HasOne(userGrp => userGrp.User)
                 .WithMany(user => user.UserGroups)
                 .HasForeignKey(userGrp => userGrp.GroupId);
 
-            modelBuilder.Entity<UserGroup>()
+            modelBuilder.Entity<DbUserGroup>()
                 .HasOne(userGrp => userGrp.Group)
                 .WithMany(grp => grp.UserGroups)
                 .HasForeignKey(userGrp => userGrp.UserId);
         }
 
-        public DbSet<User> Users { get; set; }
-        public DbSet<CustomClaim> CustomClaims { get; set; }
-        public DbSet<Group> Groups { get; set; }
-        public DbSet<UserGroup> UserGroups { get; set; }
-        public DbSet<Event> Events { get; set; }
+        public DbSet<DbUser> Users { get; set; }
+        public DbSet<DbCustomClaim> CustomClaims { get; set; }
+        public DbSet<DbGroup> Groups { get; set; }
+        public DbSet<DbUserGroup> UserGroups { get; set; }
+        public DbSet<DbEvent> Events { get; set; }
     }
 }

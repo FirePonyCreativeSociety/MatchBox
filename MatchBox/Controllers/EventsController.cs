@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AutoMapper;
+using MatchBox.API.Model;
+using MatchBox.Data;
+using MatchBox.Data.Model;
 using System.Linq;
-using System.Threading.Tasks;
-using MatchBox.Contracts;
-using MatchBox.Db;
-using Microsoft.AspNetCore.Mvc;
 
 namespace MatchBox.Controllers
 {
-    public class EventsController : RESTControllerBase<Event>
+    public class EventsController : RESTControllerBase<Event, DbEvent>
     {
-        public EventsController(MatchBoxDbContext context)
-            : base(context)
+        public EventsController(MatchBoxDbContext context, IMapper mapper)
+            : base(context, mapper)
         {
 
         }
+
+        protected override IQueryable<DbEvent> ControllerDbSet => Context.Events;
     }
 }

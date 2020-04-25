@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AutoMapper;
+using MatchBox.API.Model;
+using MatchBox.Data;
+using MatchBox.Data.Model;
 using System.Linq;
-using System.Threading.Tasks;
-using MatchBox.Contracts;
-using MatchBox.Db;
-using Microsoft.AspNetCore.Mvc;
 
 namespace MatchBox.Controllers
 {
-    public class GroupsController : RESTControllerBase<Group>
+    public class GroupsController : RESTControllerBase<Group, DbGroup>
     {
-        public GroupsController(MatchBoxDbContext context)
-            : base(context)
+        public GroupsController(MatchBoxDbContext context, IMapper mapper)
+            : base(context, mapper)
         {
 
         }
+
+        protected override IQueryable<DbGroup> ControllerDbSet => Context.Groups;
     }
 }

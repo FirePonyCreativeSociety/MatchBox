@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MatchBox.Db
+namespace MatchBox.Data.Extensions
 {
     // Inspired by https://stackoverflow.com/questions/18716928/how-to-write-a-async-method-with-out-parameter
     // See Jerry Nixon's options on how to get around the fact out arguments are not ok with async methods.

@@ -1,10 +1,12 @@
+using AutoMapper;
+using MatchBox.Data;
+using MatchBox.Model.Mapping;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
-using MatchBox.Db;
 
 namespace MatchBox
 {
@@ -20,6 +22,8 @@ namespace MatchBox
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper(typeof(APIAutoMapProfile));
+
             services.AddDbContext<MatchBoxDbContext>(opt =>
                opt.UseSqlServer(Configuration.GetConnectionString(MatchBoxDbContext.DbConnectionName)));
 

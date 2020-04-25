@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace MatchBox.Data.Helpers
+namespace MatchBox.Data.Extensions
 {
     public static class IListExtensions
     {

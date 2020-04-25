@@ -1,12 +1,11 @@
-﻿using MatchBox.Contracts;
-using System;
+﻿using MatchBox.Data.Extensions;
+using MatchBox.Data.Model;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MatchBox.Data.Helpers;
-using Microsoft.EntityFrameworkCore;
 
-namespace MatchBox.Db
+namespace MatchBox.Data
 {
     public static class MatchBoxDbInitializer
     {
@@ -38,7 +37,7 @@ namespace MatchBox.Db
         const string MetaUserName = "Meta";
         const string GrinsUserName = "Grins";
 
-        static IEnumerable<User> GenerateDefaultUsersAndGroupLinks(MatchBoxDbContext context, IEnumerable<Group> defaultGroups)
+        static IEnumerable<DbUser> GenerateDefaultUsersAndGroupLinks(MatchBoxDbContext context, IEnumerable<DbGroup> defaultGroups)
         {
             var g_admin = defaultGroups.Single(g => g.Name == AdminGroupName);
             var g_sonofabit = defaultGroups.Single(g => g.Name == SonOfABitGroupName);
@@ -46,19 +45,19 @@ namespace MatchBox.Db
             var g_sanct = defaultGroups.Single(g => g.Name == SanctuaryBitGroupName);
             var g_moder = defaultGroups.Single(g => g.Name == ModerangersGroupName);
 
-            var list = new List<User>();
+            var list = new List<DbUser>();
 
             // Admin
-            var admin = list.AddAndReturn(new User
+            var admin = list.AddAndReturn(new DbUser
             {
                 UserName = MatchBoxDbContext.AdminUserName,
                 Email = "me@thisserver.net",
                 FirstName = "Admin",                
             });
-            admin.UserGroups.Add(new UserGroup { Group = g_admin}); // The Group is sufficient. No need to set the User.
+            admin.UserGroups.Add(new DbUserGroup { Group = g_admin}); // The Group is sufficient. No need to set the User.
 
             // AleF
-            var alef = list.AddAndReturn(new User
+            var alef = list.AddAndReturn(new DbUser
             {
                 UserName = AleFUserName,
                 Email = "myemail@gmail.com",
@@ -66,51 +65,51 @@ namespace MatchBox.Db
                 MiddleName = "Alessandro",
                 LastName = "Federici",
             });
-            alef.UserGroups.Add(new UserGroup { Group = g_admin});
-            alef.UserGroups.Add(new UserGroup { Group = g_sonofabit });
+            alef.UserGroups.Add(new DbUserGroup { Group = g_admin});
+            alef.UserGroups.Add(new DbUserGroup { Group = g_sonofabit });
 
             // Zac
-            var zac = list.AddAndReturn(new User
+            var zac = list.AddAndReturn(new DbUser
             {
                 UserName = ZacUserName,
                 Email = "zak@lucasarts.net",
                 FirstName = "Zac",
                 LastName = "McKracken",
             });
-            zac.UserGroups.Add(new UserGroup { Group = g_admin });
-            zac.UserGroups.Add(new UserGroup { Group = g_edmcafe });
+            zac.UserGroups.Add(new DbUserGroup { Group = g_admin });
+            zac.UserGroups.Add(new DbUserGroup { Group = g_edmcafe });
 
             // MrK
-            var mrk = list.AddAndReturn(new User
+            var mrk = list.AddAndReturn(new DbUser
             {
                 UserName = MrKUserName,
                 Email = "keith@thisserver.com",
                 FirstName = "Keith",
                 LastName = "Longbeard",
             });
-            mrk.UserGroups.Add(new UserGroup { Group = g_admin });
+            mrk.UserGroups.Add(new DbUserGroup { Group = g_admin });
 
             // Meta
-            var meta = list.AddAndReturn(new User
+            var meta = list.AddAndReturn(new DbUser
             {
                 UserName = MetaUserName,
                 Email = "scott@thatserver.net",
                 FirstName = "Scott",
                 LastName = "Meta",            
             });
-            meta.UserGroups.Add(new UserGroup { Group = g_sanct });
-            meta.UserGroups.Add(new UserGroup { Group = g_moder });
+            meta.UserGroups.Add(new DbUserGroup { Group = g_sanct });
+            meta.UserGroups.Add(new DbUserGroup { Group = g_moder });
 
             // Grins
-            var grins = list.AddAndReturn(new User
+            var grins = list.AddAndReturn(new DbUser
             {
                 UserName = GrinsUserName,
                 Email = "diana@whateverserver.net",
                 FirstName = "Diana",
                 LastName = "Happy",
             });
-            grins.UserGroups.Add(new UserGroup { Group = g_sanct });
-            grins.UserGroups.Add(new UserGroup { Group = g_moder });
+            grins.UserGroups.Add(new DbUserGroup { Group = g_sanct });
+            grins.UserGroups.Add(new DbUserGroup { Group = g_moder });
 
             //// Bunch of other random users
             //for (int i = 0; i < 300; i++)
@@ -134,35 +133,35 @@ namespace MatchBox.Db
         const string AdminGroupName = "Administrators";
         const string ModerangersGroupName = "Moderangers";
 
-        static IEnumerable<Group> GenerateDefaultGroups(MatchBoxDbContext context)
+        static IEnumerable<DbGroup> GenerateDefaultGroups(MatchBoxDbContext context)
         {
-            var list = new List<Group>();
+            var list = new List<DbGroup>();
 
-            list.Add(new Group
+            list.Add(new DbGroup
             {
                 Name = AdminGroupName,
                 Description = "Administrators only.",
             });
 
-            list.Add(new Group
+            list.Add(new DbGroup
             { 
                 Name = SonOfABitGroupName,
                 Description = "Arcades of the 80s and 90s are back! Join us for some digital fun.",                                
             });
 
-            list.Add(new Group
+            list.Add(new DbGroup
             {
                 Name = EdmCafeGroupName,
                 Description = "Great EDM music playing all night long! BYOB obviously.",
             });
 
-            list.Add(new Group
+            list.Add(new DbGroup
             {
                 Name = SanctuaryBitGroupName,
                 Description = "The right place to go when you the inner pug goes on vacation.",
             });
 
-            list.Add(new Group
+            list.Add(new DbGroup
             {
                 Name = ModerangersGroupName,
                 Description = "The heroes that make sure bad things don't happen.",

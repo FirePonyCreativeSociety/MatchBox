@@ -1,33 +1,40 @@
-﻿using MatchBox.Contracts;
-using MatchBox.Db;
+﻿using AutoMapper;
+using MatchBox.API.Model;
+using MatchBox.Data;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace MatchBox.Controllers
 {
     // Inspired by https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-3.1&tabs=visual-studio
 
-    public class RESTControllerBase<T> : MatchBoxControllerBase
-        where T : EntityBase, new()
+    public abstract class RESTControllerBase<APIMODEL, DBMODEL> : MatchBoxControllerBase
+        where APIMODEL : EntityBase, new()
+        where DBMODEL : class, new()
     {
-        public RESTControllerBase(MatchBoxDbContext context)
+        public RESTControllerBase(MatchBoxDbContext context, IMapper mapper)
             : base()
         {
             Context = context;
+            Mapper = mapper;
         }
 
-        public MatchBoxDbContext Context { get; }
+        protected MatchBoxDbContext Context { get; }
+        protected IMapper Mapper { get; }
 
-        protected async Task<T> FindById(int id)
+        protected abstract IQueryable<DBMODEL> ControllerDbSet { get; }
+
+        protected async Task<APIMODEL> FindById(int id)
         {
-            return await Context.FindAsync(typeof(T), id) as T;            
+            return await Context.FindAsync(typeof(APIMODEL), id) as APIMODEL;            
         }
 
         [HttpPost()]
-        public async Task<ActionResult<T>> Create(T value)
+        public async Task<ActionResult<APIMODEL>> Create(APIMODEL value)
         {
             Context.Add(value);
             await Context.SaveChangesAsync();
@@ -36,11 +43,11 @@ namespace MatchBox.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<T>> Delete(int id)
+        public async Task<ActionResult<APIMODEL>> Delete(int id)
         {
             var tmp = await FindById(id);
 
-            if (tmp != null)
+            if (tmp == null)
                 return NotFound();
 
             Context.Remove(tmp);
@@ -50,7 +57,7 @@ namespace MatchBox.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<T>> GetById(int id)
+        public async Task<ActionResult<APIMODEL>> GetById(int id)
         {
             var tmp = await FindById(id);
 
@@ -58,6 +65,28 @@ namespace MatchBox.Controllers
                 return tmp; 
             else 
                 return NotFound();
-        }        
+        }
+
+        [HttpGet()]
+        public async Task<ActionResult<IEnumerable<APIMODEL>>> GetAll(int skip, int take, string orderBy)
+        {
+            // https://github.com/StefH/System.Linq.Dynamic.Core/wiki/Dynamic-Expressions
+            IQueryable<DBMODEL> dbSet = ControllerDbSet;
+
+            if (string.IsNullOrWhiteSpace(orderBy))
+                orderBy = nameof(EntityBase.Id);
+
+            dbSet = dbSet.OrderBy(orderBy);
+
+            if (skip > 0)
+                dbSet = dbSet.Skip(skip);
+
+            if (take > 0)
+                dbSet = dbSet.Take(take);
+
+            var dbData = await dbSet.ToArrayAsync();
+            var result = Mapper.Map<APIMODEL[]>(dbData); // For some reason I need to use an array, not IEnumerable.
+            return result;
+        }
     }
 }
