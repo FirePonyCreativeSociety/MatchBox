@@ -16,30 +16,30 @@ namespace MatchBox.Controllers
         where APIMODEL : EntityBase, new()
         where DBMODEL : class, new()
     {
-        public RESTControllerBase(MatchBoxDbContext context, IMapper mapper)
+        public RESTControllerBase(MatchBoxDbContext dbContext, IMapper mapper)
             : base()
         {
-            Context = context;
+            DbContext = dbContext;
             Mapper = mapper;
         }
 
-        protected MatchBoxDbContext Context { get; }
+        protected MatchBoxDbContext DbContext { get; }
         protected IMapper Mapper { get; }
 
         protected abstract IQueryable<DBMODEL> ControllerDbSet { get; }
 
         protected async Task<APIMODEL> FindById(int id)
         {
-            return await Context.FindAsync(typeof(APIMODEL), id) as APIMODEL;            
+            return await DbContext.FindAsync(typeof(APIMODEL), id) as APIMODEL;            
         }
 
         [HttpPost()]
         public async Task<ActionResult<APIMODEL>> Create(APIMODEL value)
         {
             var dbValue = Mapper.Map<DBMODEL>(value);
-            Context.Add(dbValue);
+            DbContext.Add(dbValue);
 
-            await Context.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetById), new { id = value.Id }, value);
         }
@@ -52,8 +52,8 @@ namespace MatchBox.Controllers
             if (tmp == null)
                 return NotFound();
 
-            Context.Remove(tmp);
-            await Context.SaveChangesAsync();
+            DbContext.Remove(tmp);
+            await DbContext.SaveChangesAsync();
 
             return tmp;
         }

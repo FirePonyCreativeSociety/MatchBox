@@ -12,12 +12,12 @@ namespace MatchBox.Data.Model
         public string UserName { get; set; }
         [Required]
         public string Email { get; set; }
+        [Required]
+        public bool IsDisabled { get; set; }
 
         public string FirstName { get; set; }
         public string MiddleName { get; set; }
-        public string LastName { get; set; }
-        [Required] 
-        public bool IsDisabled { get; set; }
+        public string LastName { get; set; }        
 
         public ICollection<DbCustomClaim> Attributes { get; set; } = new Collection<DbCustomClaim>();
         public ICollection<DbUserGroup> UserGroups { get; set; } = new Collection<DbUserGroup>();

@@ -8,12 +8,12 @@ namespace MatchBox.Controllers
 {
     public class EventsController : RESTControllerBase<Event, DbEvent>
     {
-        public EventsController(MatchBoxDbContext context, IMapper mapper)
-            : base(context, mapper)
+        public EventsController(MatchBoxDbContext dbContext, IMapper mapper)
+            : base(dbContext, mapper)
         {
 
         }
 
-        protected override IQueryable<DbEvent> ControllerDbSet => Context.Events;
+        protected override IQueryable<DbEvent> ControllerDbSet => DbContext.Events;
     }
 }

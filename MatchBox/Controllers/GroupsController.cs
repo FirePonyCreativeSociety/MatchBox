@@ -8,12 +8,12 @@ namespace MatchBox.Controllers
 {
     public class GroupsController : RESTControllerBase<Group, DbGroup>
     {
-        public GroupsController(MatchBoxDbContext context, IMapper mapper)
-            : base(context, mapper)
+        public GroupsController(MatchBoxDbContext dbContext, IMapper mapper)
+            : base(dbContext, mapper)
         {
 
         }
 
-        protected override IQueryable<DbGroup> ControllerDbSet => Context.Groups;
+        protected override IQueryable<DbGroup> ControllerDbSet => DbContext.Groups;
     }
 }
