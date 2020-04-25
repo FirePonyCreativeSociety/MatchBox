@@ -36,7 +36,9 @@ namespace MatchBox.Controllers
         [HttpPost()]
         public async Task<ActionResult<APIMODEL>> Create(APIMODEL value)
         {
-            Context.Add(value);
+            var dbValue = Mapper.Map<DBMODEL>(value);
+            Context.Add(dbValue);
+
             await Context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetById), new { id = value.Id }, value);
