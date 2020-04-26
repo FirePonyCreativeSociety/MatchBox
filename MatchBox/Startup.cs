@@ -35,6 +35,7 @@ namespace MatchBox
             var key = Encoding.ASCII.GetBytes(settings.Secret);
             services.AddAuthentication(x =>
             {
+                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
@@ -64,7 +65,7 @@ namespace MatchBox
             {
                 c.SwaggerDoc(name: "v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "MatchBox API", Version = "v1" });
 
-                c.AddSecurityDefinition("bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new Microsoft.OpenApi.Models.OpenApiSecurityScheme
                 {
                     Description = "Standard Authorization header using the Bearer scheme. Example: 'bearer {token}'",
                     In = Microsoft.OpenApi.Models.ParameterLocation.Header,
@@ -94,9 +95,10 @@ namespace MatchBox
             });
 
             app.UseRouting();
-
+            
             app.UseAuthorization();
-
+            app.UseAuthentication();
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

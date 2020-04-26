@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MatchBox.Internal
 {
-	public class AuthenticationRequirementsOperationFilter : IOperationFilter
+	internal class AuthenticationRequirementsOperationFilter : IOperationFilter
 	{
 		public void Apply(OpenApiOperation operation, OperationFilterContext context)
 		{
