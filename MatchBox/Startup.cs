@@ -1,5 +1,6 @@
 using AutoMapper;
 using MatchBox.Data;
+using MatchBox.Data.Models;
 using MatchBox.Internal;
 using MatchBox.Model.Mapping;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -60,7 +61,9 @@ namespace MatchBox
             services.AddDbContext<MatchBoxDbContext>(opt =>
                opt.UseSqlServer(Configuration.GetConnectionString(MatchBoxDbContext.DbConnectionName)));
 
-            services.AddDefaultIdentity<>
+            services.AddIdentity<DbUser, DbRole>()
+                    .AddEntityFrameworkStores<MatchBoxDbContext>()
+                    .AddDefaultTokenProviders();
 
             services.AddControllers();
 
@@ -96,6 +99,8 @@ namespace MatchBox
             {
                 c.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "MatchBox API v1");
             });
+
+            app.UseStaticFiles();
 
             app.UseRouting();
             

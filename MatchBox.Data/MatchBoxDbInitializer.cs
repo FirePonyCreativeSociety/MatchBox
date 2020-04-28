@@ -1,32 +1,46 @@
 ﻿using MatchBox.Data.Extensions;
 using MatchBox.Data.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MatchBox.Data
 {
-    public static class MatchBoxDbInitializer
+    public class MatchBoxDbInitializer
     {
-        public static async Task Initialize(this MatchBoxDbContext context) 
+        public MatchBoxDbInitializer(IServiceProvider serviceProvider)
+            : base()
         {
-            context.Database.EnsureCreated();
+            serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+
+            // TODO: review this. I don't want too many arguments in the ctor, but querying the
+            // IServiceProvider directly is not clean...
+            Context = serviceProvider.GetRequiredService<MatchBoxDbContext>();
+            UserManager = serviceProvider.GetRequiredService<UserManager<DbUser>>();
+            RoleManager = serviceProvider.GetRequiredService<RoleManager<DbRole>>();
+        }
+
+        public MatchBoxDbContext Context { get; }
+        public UserManager<DbUser> UserManager { get; }
+        public RoleManager<DbRole> RoleManager { get; }
+
+        public async Task Initialize() 
+        {
+            Context.Database.EnsureCreated();
 
             // If no users are present we create all the default entities
-            if (await context.Users.AnyAsync())
+            if (await Context.Users.AnyAsync())
                 return;
 
-            // Adds the default groups
-            var defGroups = GenerateDefaultGroups(context);
-            await context.AddRangeAsync(defGroups);
+            // Adds the default roles
+            await GenerateDefaultRoles();
 
             // Adds the default users (this includes the admin user)
-            var users = GenerateDefaultUsersAndGroupLinks(context, defGroups);
-            await context.AddRangeAsync(users);
-
-            // Commits
-            await context.SaveChangesAsync();
+            await GenerateDefaultUsers();
         }
 
         #region Factory methods for default users
@@ -37,157 +51,102 @@ namespace MatchBox.Data
         const string MetaUserName = "Meta";
         const string GrinsUserName = "Grins";
 
-        static IEnumerable<DbUser> GenerateDefaultUsersAndGroupLinks(MatchBoxDbContext context, IEnumerable<DbGroup> defaultGroups)
+        async Task AddUser(
+            string userName, 
+            string email, 
+            string firstName,             
+            string middleName,
+            string lastName,
+            params string[] roles)
         {
-            var g_admin = defaultGroups.Single(g => g.Name == AdminGroupName);
-            var g_sonofabit = defaultGroups.Single(g => g.Name == SonOfABitGroupName);
-            var g_edmcafe = defaultGroups.Single(g => g.Name == EdmCafeGroupName);
-            var g_sanct = defaultGroups.Single(g => g.Name == SanctuaryBitGroupName);
-            var g_moder = defaultGroups.Single(g => g.Name == ModerangersGroupName);
-
-            var list = new List<DbUser>();
-
-            // Admin
-            var admin = list.AddAndReturn(new DbUser
+            var newUser = new DbUser
             {
-                UserName = MatchBoxDbContext.AdminUserName,
-                Email = "me@thisserver.net",
-                FirstName = "Admin",                
-            });
-            admin.UserGroups.Add(new DbUserGroup { Group = g_admin}); // The Group is sufficient. No need to set the User.
+                UserName = userName,
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                Email = email,
+            };
+
+            var result = await UserManager.CreateAsync(newUser, userName.ToLower() + "_A123");
+            if (!result.Succeeded)
+                throw new System.Exception($"Could not create the default user '{userName}'.");
+
+            var result2 = await UserManager.AddToRolesAsync(newUser, roles);
+            if (!result.Succeeded)
+                throw new System.Exception($"Could not add the default roles of user '{userName}'.");
+        }
+
+        
+        
+        async Task GenerateDefaultUsers()
+        {
+            // Admin
+            await AddUser(userName: MatchBoxDbContext.AdminUserName, email: "me@thisserver.net", firstName: "System", middleName: null, lastName: "Administrator",
+                          AdminRoleName);
 
             // AleF
-            var alef = list.AddAndReturn(new DbUser
-            {
-                UserName = AleFUserName,
-                Email = "myemail@gmail.com",
-                FirstName = "Federico",
-                MiddleName = "Alessandro",
-                LastName = "Federici",
-            });
-            alef.UserGroups.Add(new DbUserGroup { Group = g_admin});
-            alef.UserGroups.Add(new DbUserGroup { Group = g_sonofabit });
+            await AddUser(userName: AleFUserName, email: "myemail@gmail.com", firstName: "Federico", middleName: "Alessandro", lastName: "Federici",
+                          AdminRoleName, SonOfABitRoleName);
 
             // Zac
-            var zac = list.AddAndReturn(new DbUser
-            {
-                UserName = ZacUserName,
-                Email = "zak@lucasarts.net",
-                FirstName = "Zac",
-                LastName = "McKracken",
-            });
-            zac.UserGroups.Add(new DbUserGroup { Group = g_admin });
-            zac.UserGroups.Add(new DbUserGroup { Group = g_edmcafe });
+            await AddUser(userName: ZacUserName, email: "zak@lucasarts.net", firstName: "Zac", middleName: null, lastName: "McKracken",
+                          AdminRoleName, EdmCafeRoleName);
 
             // MrK
-            var mrk = list.AddAndReturn(new DbUser
-            {
-                UserName = MrKUserName,
-                Email = "keith@thisserver.com",
-                FirstName = "Keith",
-                LastName = "Longbeard",
-            });
-            mrk.UserGroups.Add(new DbUserGroup { Group = g_admin });
+            await AddUser(userName: MrKUserName, email: "keith@thisserver.com", firstName: "Keith", middleName: null, lastName: "Longbeard",
+                          AdminRoleName);
 
             // Meta
-            var meta = list.AddAndReturn(new DbUser
-            {
-                UserName = MetaUserName,
-                Email = "scott@thatserver.net",
-                FirstName = "Scott",
-                LastName = "Meta",            
-            });
-            meta.UserGroups.Add(new DbUserGroup { Group = g_sanct });
-            meta.UserGroups.Add(new DbUserGroup { Group = g_moder });
+            await AddUser(userName: MetaUserName, email: "scott@thatserver.net", firstName: "Scott", middleName: null, lastName: "Meta",
+                          SanctuaryBitRoleName, ModerangersRoleName);
 
             // Grins
-            var grins = list.AddAndReturn(new DbUser
-            {
-                UserName = GrinsUserName,
-                Email = "diana@whateverserver.net",
-                FirstName = "Diana",
-                LastName = "Happy",
-            });
-            grins.UserGroups.Add(new DbUserGroup { Group = g_sanct });
-            grins.UserGroups.Add(new DbUserGroup { Group = g_moder });
-
-            //// Bunch of other random users
-            //for (int i = 0; i < 300; i++)
-            //{
-            //    var strId = i.ToString("D3");
-            //    list.Add(new User
-            //    {
-            //        UserName = $"User{strId}",
-            //        Email = $"emailOfUser{strId}@noserver.net",
-            //        FirstName = "User",
-            //        LastName = strId,
-            //    });
-            //}
-
-            return list;
+            await AddUser(userName: GrinsUserName, email: "diana@whateverserver.net", firstName: "Diana", middleName: null, lastName: "Happy",
+            SanctuaryBitRoleName, ModerangersRoleName);
+            
+            ////// Bunch of other random users
+            ////for (int i = 0; i < 300; i++)
+            ////{
+            ////    var strId = i.ToString("D3");
+            ////    list.Add(new User
+            ////    {
+            ////        UserName = $"User{strId}",
+            ////        Email = $"emailOfUser{strId}@noserver.net",
+            ////        FirstName = "User",
+            ////        LastName = strId,
+            ////    });
+            ////}
+            //
+            //return list;
         }
 
-        const string SonOfABitGroupName = "Son Of a Bit";
-        const string EdmCafeGroupName = "EDM Cafe";
-        const string SanctuaryBitGroupName = "Sanctuary";
-        const string AdminGroupName = "Administrators";
-        const string ModerangersGroupName = "Moderangers";
+        const string AdminRoleName = "Administrators";
+        const string SonOfABitRoleName = "Son Of a Bit";
+        const string EdmCafeRoleName = "EDM Cafe";
+        const string SanctuaryBitRoleName = "Sanctuary";        
+        const string ModerangersRoleName = "Moderangers";
 
-        static IEnumerable<DbGroup> GenerateDefaultGroups(MatchBoxDbContext context)
+        async Task AddRole(string name, string description)
         {
-            var list = new List<DbGroup>();
-
-            list.Add(new DbGroup
+            var newRole = new DbRole
             {
-                Name = AdminGroupName,
-                Description = "Administrators only.",
-            });
-
-            list.Add(new DbGroup
-            { 
-                Name = SonOfABitGroupName,
-                Description = "Arcades of the 80s and 90s are back! Join us for some digital fun.",                                
-            });
-
-            list.Add(new DbGroup
-            {
-                Name = EdmCafeGroupName,
-                Description = "Great EDM music playing all night long! BYOB obviously.",
-            });
-
-            list.Add(new DbGroup
-            {
-                Name = SanctuaryBitGroupName,
-                Description = "The right place to go when you the inner pug goes on vacation.",
-            });
-
-            list.Add(new DbGroup
-            {
-                Name = ModerangersGroupName,
-                Description = "The heroes that make sure bad things don't happen.",
-            });
-
-            return list;
+                Name = name,
+                Description = description
+            };
+            
+            await RoleManager.CreateAsync(newRole);
         }
 
-        //static void LinkDefaultGroupsAndUsers(IEnumerable<User> users, IEnumerable<Group> groups)
-        //{
-        //    //var u_admin = users.Single(u => u.UserName == MatchBoxDbContext.AdminUserName);
-        //    var u_alef = users.Single(u => u.UserName==AleFUserName);
-        //    var u_zac = users.Single(u => u.UserName == ZacUserName);                        
-        //    var u_mrk = users.Single(u => u.UserName == MrKUserName);
-        //    var u_meta = users.Single(u => u.UserName == MetaUserName);
-        //    var u_grins = users.Single(u => u.UserName == GrinsUserName);
-        //
-        //    var g_admin = groups.Single(g => g.Name == AdminGroupName);
-        //    var g_sonofabit = groups.Single(g => g.Name == SonOfABitGroupName);
-        //    var g_edmcafe = groups.Single(g => g.Name == SonOfABitGroupName);
-        //    var g_sanct = groups.Single(g => g.Name == SonOfABitGroupName);
-        //    var g_rangers = groups.Single(g => g.Name == ModerangersGroupName);
-        //
-        //
-        //}
+        async Task GenerateDefaultRoles()
+        {
+            await AddRole(AdminRoleName, "Administrators only.");
+            await AddRole(SonOfABitRoleName, "Arcades of the 80s and 90s are back! Join us for some digital fun.");
+            await AddRole(EdmCafeRoleName, "Great EDM music playing all night long! BYOB obviously.");
+            await AddRole(SanctuaryBitRoleName, "The right place to go when you the inner pug goes on vacation.");
+            await AddRole(ModerangersRoleName, "The heroes that make sure bad things don't happen.");
+        }
 
-        #endregion        
+        #endregion
     }
 }

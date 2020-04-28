@@ -1,13 +1,15 @@
 ﻿using MatchBox.Data.Models;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace MatchBox.Data
 {
-    public class MatchBoxDbContext : IdentityDbContext<DbUser>
+    public class MatchBoxDbContext : IdentityDbContext<DbUser, DbRole, int>
     {
         public const string DbConnectionName = "MatchBoxDb";
         public const string AdminUserName = "admin";
+        const string SecuritySchemaName = "Security";
 
         public MatchBoxDbContext(DbContextOptions<MatchBoxDbContext> options)
             : base(options)
@@ -20,26 +22,71 @@ namespace MatchBox.Data
             base.OnConfiguring(optionsBuilder);
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            modelBuilder.Entity<DbUserGroup>()
-                .HasKey(ug => new { ug.UserId, ug.GroupId });
+            base.OnModelCreating(builder);            
 
-            modelBuilder.Entity<DbUserGroup>()
-                .HasOne(userGrp => userGrp.User)
-                .WithMany(user => user.UserGroups)
-                .HasForeignKey(userGrp => userGrp.GroupId);
+            builder.Entity<DbUser>(entity =>
+            {
+                entity.ToTable(name: "Users", schema: SecuritySchemaName);
+                entity.Property(e => e.Id).HasColumnName("UserId");
 
-            modelBuilder.Entity<DbUserGroup>()
-                .HasOne(userGrp => userGrp.Group)
-                .WithMany(grp => grp.UserGroups)
-                .HasForeignKey(userGrp => userGrp.UserId);
-        }
+                // Each User can have many UserClaims
+                //entity.HasMany(e => e.Claims)
+                //      .WithOne()
+                //      .HasForeignKey(uc => uc.UserId)
+                //      .IsRequired();
+            });
 
-        public DbSet<DbUser> Users { get; set; }
-        public DbSet<DbCustomClaim> CustomClaims { get; set; }
-        public DbSet<DbGroup> Groups { get; set; }
-        public DbSet<DbUserGroup> UserGroups { get; set; }
-        public DbSet<DbEvent> Events { get; set; }
+            builder.Entity<DbRole>(entity =>
+            {
+                entity.ToTable(name: "Roles", schema: SecuritySchemaName);
+                entity.Property(e => e.Id).HasColumnName("RoleId");
+
+            });
+
+            builder.Entity<IdentityUserClaim<int>>(entity =>
+            {
+                entity.ToTable("UserClaims", schema: SecuritySchemaName);
+                entity.Property(e => e.UserId).HasColumnName("UserId");
+                entity.Property(e => e.Id).HasColumnName("UserClaimId");
+
+            });
+
+            builder.Entity<IdentityUserLogin<int>>(entity =>
+            {
+                entity.ToTable("UserLogins", schema: SecuritySchemaName);
+                entity.Property(e => e.UserId).HasColumnName("UserId");
+
+            });
+
+            builder.Entity<IdentityRoleClaim<int>>(entity =>
+            {
+                entity.ToTable("RoleClaims", schema: SecuritySchemaName);
+                entity.Property(e => e.Id).HasColumnName("RoleClaimId");
+                entity.Property(e => e.RoleId).HasColumnName("RoleId");
+            });
+
+            builder.Entity<IdentityUserRole<int>>(entity =>
+            {
+                entity.ToTable("UserRoles", schema: SecuritySchemaName);
+                entity.Property(e => e.UserId).HasColumnName("UserId");
+                entity.Property(e => e.RoleId).HasColumnName("RoleId");
+
+            });
+
+            builder.Entity<IdentityUserToken<int>>(entity =>
+            {
+                entity.ToTable("UserTokens", schema: SecuritySchemaName);
+                entity.Property(e => e.UserId).HasColumnName("UserId");
+
+            });
+
+            builder.Entity<DbEvent>(entity =>
+            {
+                entity.ToTable("Events", schema: SecuritySchemaName);
+                entity.HasKey(nameof(DbEvent.Id));
+            });
+        }        
     }
 }

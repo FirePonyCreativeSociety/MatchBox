@@ -9,11 +9,11 @@ namespace MatchBox.Data.Extensions
 
     public static class MatchBoxDbContextExtensions
     {
-        public static async Task<AsyncTryFindResult<DbUser>> TryFindUserByName(this MatchBoxDbContext context, string userName)
-        {
-            return new AsyncTryFindResult<DbUser>(
-                await context.Users.SingleOrDefaultAsync(u => u.UserName==userName)
-                );
-        }
+        //public static async Task<AsyncTryFindResult<DbUser>> TryFindUserByName(this MatchBoxDbContext context, string userName)
+        //{
+        //    return new AsyncTryFindResult<DbUser>(
+        //        await context.Users.SingleOrDefaultAsync(u => u.UserName==userName)
+        //        );
+        //}
     }
 }
