@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace MatchBox.Internal
 				Reference = new OpenApiReference 
 				{ 
 					Type = ReferenceType.SecurityScheme, 
-					Id = "bearer" 
+					Id = JwtBearerDefaults.AuthenticationScheme
 				} 
 			};
 
