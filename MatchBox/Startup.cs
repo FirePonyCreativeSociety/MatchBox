@@ -61,7 +61,11 @@ namespace MatchBox
             services.AddDbContext<MatchBoxDbContext>(opt =>
                opt.UseSqlServer(Configuration.GetConnectionString(MatchBoxDbContext.DbConnectionName)));
 
-            services.AddIdentity<DbUser, DbRole>()
+            services.AddIdentity<DbUser, DbRole>(options =>
+                    {
+                        options.User.RequireUniqueEmail = true;
+                        //options.User.AllowedUserNameCharacters
+                    })                
                     .AddEntityFrameworkStores<MatchBoxDbContext>()
                     .AddDefaultTokenProviders();
 

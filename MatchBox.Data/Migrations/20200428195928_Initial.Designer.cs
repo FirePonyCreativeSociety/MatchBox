@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MatchBox.Data.Migrations
 {
     [DbContext(typeof(MatchBoxDbContext))]
-    [Migration("20200428193937_Initial")]
+    [Migration("20200428195928_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

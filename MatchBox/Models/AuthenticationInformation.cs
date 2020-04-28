@@ -9,7 +9,7 @@ namespace MatchBox.Model
     public class AuthenticationInformation
     {
         [Required]
-        public string Username { get; set; }
+        public string UsernameOrEmail { get; set; }
 
         [Required]
         public string Password { get; set; }

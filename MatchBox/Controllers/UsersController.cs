@@ -6,6 +6,7 @@ using MatchBox.Data.Models;
 using MatchBox.Internal;
 using MatchBox.Model;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Linq;
@@ -17,15 +18,15 @@ namespace MatchBox.Controllers
     {
         private const string BadLoginMessage = "Username or password is incorrect";
 
-        public UsersController(MatchBoxDbContext dbContext, IMapper mapper, IOptions<MatchBoxSettings> settings, IJwtProducer jwtProducer)
+        public UsersController(MatchBoxDbContext dbContext, IMapper mapper, IJwtProducer jwtProducer, UserManager<DbUser> userManager)
             : base(dbContext, mapper)
         {
-            Settings = settings.Value;
             JwtProducer = jwtProducer;
+            UserManager = userManager;
         }
 
-        public MatchBoxSettings Settings { get; }
         public IJwtProducer JwtProducer { get; }
+        public UserManager<DbUser> UserManager { get; }
 
         protected override IQueryable<DbUser> ControllerDbSet => DbContext.Users;
 
@@ -33,11 +34,13 @@ namespace MatchBox.Controllers
         [HttpPost("authenticate")]
         public async Task<IActionResult> Authenticate([FromBody] AuthenticationInformation model)
         {
-            var tmp = await DbContext.TryFindUserByName(model.Username);
-            if (!tmp.Found)
+            var user = await UserManager.FindByNameAsync(model.UsernameOrEmail);
+            user = user ?? await UserManager.FindByEmailAsync(model.UsernameOrEmail);
+            if (user == null)
                 return BadRequest(new { message = BadLoginMessage });
-
-            var jwt = JwtProducer.Generate(tmp.Value);            
+            
+            var jwt = JwtProducer.Generate(user);
+            
             return Ok(jwt);
         }
     }

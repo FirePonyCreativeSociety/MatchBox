@@ -9,13 +9,11 @@
   <ItemGroup>
     <Compile Remove="Controllers\EventsController.cs" />
     <Compile Remove="Controllers\GroupsController.cs" />
-    <Compile Remove="Controllers\UsersController.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="Controllers\EventsController.cs" />
     <None Include="Controllers\GroupsController.cs" />
-    <None Include="Controllers\UsersController.cs" />
   </ItemGroup>
 
   <ItemGroup>
