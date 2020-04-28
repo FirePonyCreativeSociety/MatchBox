@@ -15,7 +15,7 @@ namespace MatchBox.Internal
 			if (operation.Security == null)
 				operation.Security = new List<OpenApiSecurityRequirement>();
 
-
+			//Branch only?
 			var scheme = new OpenApiSecurityScheme 
 			{ 
 				Reference = new OpenApiReference 
