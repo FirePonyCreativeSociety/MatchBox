@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace MatchBox.Data.Model
+namespace MatchBox.Data.Models
 {
     public class DbCustomClaim : DbEntityBase
     {

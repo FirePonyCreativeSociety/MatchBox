@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 
-namespace MatchBox.API.Model
+namespace MatchBox.API.Models
 {
     public class Group : EntityBase
     {

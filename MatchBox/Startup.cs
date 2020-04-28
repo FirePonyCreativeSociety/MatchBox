@@ -60,6 +60,8 @@ namespace MatchBox
             services.AddDbContext<MatchBoxDbContext>(opt =>
                opt.UseSqlServer(Configuration.GetConnectionString(MatchBoxDbContext.DbConnectionName)));
 
+            services.AddDefaultIdentity<>
+
             services.AddControllers();
 
             services.AddSwaggerGen(c => 

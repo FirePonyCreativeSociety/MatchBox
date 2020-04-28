@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace MatchBox.API.Model
+namespace MatchBox.API.Models
 {
     public class User : EntityBase
     {        

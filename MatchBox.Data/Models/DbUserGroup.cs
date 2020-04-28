@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MatchBox.Data.Model
+namespace MatchBox.Data.Models
 {
     public class DbUserGroup
     {

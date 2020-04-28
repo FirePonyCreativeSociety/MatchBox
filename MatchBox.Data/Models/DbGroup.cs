@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace MatchBox.Data.Model
+namespace MatchBox.Data.Models
 {
     public class DbGroup : DbEntityBase
     {

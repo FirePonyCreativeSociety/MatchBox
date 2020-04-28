@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using MatchBox.API.Model;
-using MatchBox.Data.Model;
+using MatchBox.API.Models;
+using MatchBox.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

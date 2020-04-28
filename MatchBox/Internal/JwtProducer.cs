@@ -1,4 +1,4 @@
-﻿using MatchBox.Data.Model;
+﻿using MatchBox.Data.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;

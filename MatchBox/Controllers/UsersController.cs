@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using MatchBox.API.Model;
+using MatchBox.API.Models;
 using MatchBox.Data;
 using MatchBox.Data.Extensions;
-using MatchBox.Data.Model;
+using MatchBox.Data.Models;
 using MatchBox.Internal;
 using MatchBox.Model;
 using Microsoft.AspNetCore.Authorization;

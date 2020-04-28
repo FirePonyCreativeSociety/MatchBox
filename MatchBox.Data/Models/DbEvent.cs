@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MatchBox.API.Model
+namespace MatchBox.Data.Models
 {
-    public class Event : EntityBase
+    public class DbEvent : DbEntityBase
     {
     }
 }

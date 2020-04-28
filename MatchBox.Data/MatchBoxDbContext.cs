@@ -1,9 +1,10 @@
-﻿using MatchBox.Data.Model;
+﻿using MatchBox.Data.Models;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 
 namespace MatchBox.Data
 {
-    public class MatchBoxDbContext : DbContext
+    public class MatchBoxDbContext : IdentityDbContext<DbUser>
     {
         public const string DbConnectionName = "MatchBoxDb";
         public const string AdminUserName = "admin";

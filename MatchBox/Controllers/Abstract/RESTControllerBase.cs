@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using MatchBox.API.Model;
+using MatchBox.API.Models;
 using MatchBox.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

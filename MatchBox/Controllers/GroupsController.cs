@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using MatchBox.API.Model;
+using MatchBox.API.Models;
 using MatchBox.Data;
-using MatchBox.Data.Model;
+using MatchBox.Data.Models;
 using System.Linq;
 
 namespace MatchBox.Controllers
