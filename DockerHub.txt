@@ -1,0 +1,6 @@
+https://www.softwaredeveloper.blog/multi-project-dotnet-core-solution-in-docker-image
+
+-Open command prompt in the solution's directory
+-docker build -f MatchBox/DockerFile -t afederici1975/matchbox .  	
+-docker push afederici1975/matchbox
+-docker run -d -p 18080:80 -p 18443:443 afederici1975/matchbox

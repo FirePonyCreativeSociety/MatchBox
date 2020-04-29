@@ -10,7 +10,7 @@ namespace MatchBox.Data
         DbUserClaim, DbUserRole, DbUserLogin,
         DbRoleClaim, DbUserToken>
     {
-        public const string DbConnectionName = "MatchBoxDb";
+        public const string DbConnectionName = "MatchBox";
         public const string AdminUserName = "admin";
         const string SecuritySchemaName = null;// "Security";
 

@@ -5,7 +5,12 @@ VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MatchBox", "MatchBox\MatchBox.csproj", "{F351E2EA-54A1-457F-B08F-970AD9304E33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchBox.Data", "MatchBox.Data\MatchBox.Data.csproj", "{5B828578-45CF-4524-8B0D-6D2407AE56BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MatchBox.Data", "MatchBox.Data\MatchBox.Data.csproj", "{5B828578-45CF-4524-8B0D-6D2407AE56BA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{01F24B17-95F7-47EE-97D6-488F33B0E42B}"
+	ProjectSection(SolutionItems) = preProject
+		DockerHub.txt = DockerHub.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -8,6 +8,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
 COPY ["MatchBox/MatchBox.csproj", "MatchBox/"]
+COPY ["MatchBox.Data/MatchBox.Data.csproj", "MatchBox.Data/"]
 RUN dotnet restore "MatchBox/MatchBox.csproj"
 COPY . .
 WORKDIR "/src/MatchBox"
