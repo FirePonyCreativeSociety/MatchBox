@@ -11,6 +11,7 @@ namespace MatchBox.Data.Models
         public int UserId { get; set; }
         public DbUser User { get; set; }
 
+        [Key]
         public int GroupId { get; set; }
         public DbGroup Group { get; set; }
     }

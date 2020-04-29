@@ -24,7 +24,7 @@ namespace MatchBox.Internal
         public string Generate(DbUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(Settings.Secret);
+            var key = Encoding.ASCII.GetBytes(Settings.Jwt.IssuerSigningKey);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
@@ -32,7 +32,9 @@ namespace MatchBox.Internal
                     new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(ClaimTypes.GivenName, user.FirstName),
-                    new Claim(ClaimTypes.Surname, user.LastName),                
+                    new Claim(ClaimTypes.Surname, user.LastName),      
+                    new Claim(ClaimTypes.DateOfBirth, user.DateOfBirth.ToString()),
+
                 }),
                 Issuer = "MatchBox",
                 Expires = DateTime.UtcNow.AddDays(7),

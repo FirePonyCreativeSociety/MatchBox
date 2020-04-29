@@ -30,6 +30,10 @@
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "environmentVariables": {
+        "MatchBoxSettings:Jwt:IssuerSigningKey": "bubba roicks!",
+        "MatchBoxSettings:User:MaxFailedAccessAttempts": "3"
+      },
       "publishAllPorts": true,
       "useSSL": true
     }

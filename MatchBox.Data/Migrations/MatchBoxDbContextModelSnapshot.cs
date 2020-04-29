@@ -30,6 +30,7 @@ namespace MatchBox.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -39,8 +40,9 @@ namespace MatchBox.Data.Migrations
 
             modelBuilder.Entity("MatchBox.Data.Models.DbGroup", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("GroupId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnName("GroupId")
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -50,10 +52,17 @@ namespace MatchBox.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("GroupId");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Groups");
                 });
@@ -106,7 +115,6 @@ namespace MatchBox.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("RoleId")
-                        .HasColumnName("RoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -216,7 +224,6 @@ namespace MatchBox.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
-                        .HasColumnName("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -229,14 +236,12 @@ namespace MatchBox.Data.Migrations
             modelBuilder.Entity("MatchBox.Data.Models.DbUserGroup", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnName("UserId")
                         .HasColumnType("int");
 
                     b.Property<int>("GroupId")
-                        .HasColumnName("GroupId")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId");
+                    b.HasKey("UserId", "GroupId");
 
                     b.HasIndex("GroupId");
 
@@ -255,7 +260,6 @@ namespace MatchBox.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
-                        .HasColumnName("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("LoginProvider", "ProviderKey");
@@ -268,11 +272,9 @@ namespace MatchBox.Data.Migrations
             modelBuilder.Entity("MatchBox.Data.Models.DbUserRole", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnName("UserId")
                         .HasColumnType("int");
 
                     b.Property<int>("RoleId")
-                        .HasColumnName("RoleId")
                         .HasColumnType("int");
 
                     b.HasKey("UserId", "RoleId");
@@ -285,7 +287,6 @@ namespace MatchBox.Data.Migrations
             modelBuilder.Entity("MatchBox.Data.Models.DbUserToken", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnName("UserId")
                         .HasColumnType("int");
 
                     b.Property<string>("LoginProvider")

@@ -1,21 +1,34 @@
-﻿using System;
+﻿using MatchBox.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace MatchBox.API.Models
 {
-    public class User : EntityBase
-    {        
-        public string UserName { get; set; }
-        public string Email { get; set; }
+    public class User : IIntId
+    {
+        public int UserId { get; set; }
 
-        public string FirstName { get; set; }
-        public string MiddleName { get; set; }
-        public string LastName { get; set; }
         public bool IsDisabled { get; set; }
 
-        public ICollection<CustomClaim> Attributes { get; set; } = new Collection<CustomClaim>();
+        [Required]
+        public string UserName { get; set; }
+        [Required, EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        public DateTime DateOfBirth { get; set; }
+
+        [Required]
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        [Required]
+        public string LastName { get; set; }
+
+        //public ICollection<CustomClaim> CustomClaims { get; set; } = new Collection<CustomClaim>();
         public ICollection<UserGroup> UserGroups { get; set; } = new Collection<UserGroup>();
+
+        int IIntId.GetId() => this.UserId;
     }
 }

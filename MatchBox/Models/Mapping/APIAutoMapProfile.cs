@@ -14,10 +14,10 @@ namespace MatchBox.Model.Mapping
             : base()
         {
             CreateMap<User, DbUser>().ReverseMap();
-            //CreateMap<Group, DbGroup>().ReverseMap(); 
-            //CreateMap<UserGroup, DbUserGroup>().ReverseMap();
-            //CreateMap<CustomClaim, DbCustomClaim>().ReverseMap();
-            //CreateMap<Event, DbEvent>().ReverseMap();
+            CreateMap<Group, DbGroup>().ReverseMap(); 
+            CreateMap<UserGroup, DbUserGroup>().ReverseMap();
+
+            CreateMap<Event, DbEvent>().ReverseMap();
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using MatchBox.API.Models;
 using MatchBox.Data;
+using MatchBox.Models;
+using MatchBox.Models.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -13,7 +15,7 @@ namespace MatchBox.Controllers
     // Inspired by https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-3.1&tabs=visual-studio
 
     public abstract class RESTControllerBase<APIMODEL, DBMODEL> : MatchBoxControllerBase
-        where APIMODEL : EntityBase, new()
+        where APIMODEL : class, IIntId, new()
         where DBMODEL : class, new()
     {
         public RESTControllerBase(MatchBoxDbContext dbContext, IMapper mapper)
@@ -41,7 +43,7 @@ namespace MatchBox.Controllers
 
             await DbContext.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById), new { id = value.Id }, value);
+            return CreatedAtAction(nameof(GetById), new { id = value.GetId() }, value);
         }
 
         [HttpDelete("{id}")]
@@ -70,21 +72,35 @@ namespace MatchBox.Controllers
         }
 
         [HttpGet()]
-        public async Task<ActionResult<IEnumerable<APIMODEL>>> GetAll(int skip, int take, string orderBy)
+        public async Task<ActionResult<IEnumerable<APIMODEL>>> GetAll(QueryModel model)
         {
             // https://github.com/StefH/System.Linq.Dynamic.Core/wiki/Dynamic-Expressions
             IQueryable<DBMODEL> dbSet = ControllerDbSet;
 
-            if (string.IsNullOrWhiteSpace(orderBy))
-                orderBy = nameof(EntityBase.Id);
+            if (model.SortBy != null)
+            {                
+                var ordered = dbSet.OrderBy(model.SortBy.First());
+                foreach (var f in model.SortBy.Skip(1))
+                    ordered = ordered.ThenBy(f);
 
-            dbSet = dbSet.OrderBy(orderBy);
+                dbSet = ordered;
+            }
+            else
+            {
+                //dbSet = dbSet.OrderBy(x => x.);
+            }
 
-            if (skip > 0)
-                dbSet = dbSet.Skip(skip);
+            if (model.Include != null)
+            {
+                foreach (var i in model.Include)
+                    dbSet = dbSet.Include(i);
+            }
+            
+            if ((model.Skip.HasValue) && (model.Skip > 0))
+                dbSet = dbSet.Skip(model.Skip.Value);
 
-            if (take > 0)
-                dbSet = dbSet.Take(take);
+            if ((model.Take.HasValue) && (model.Take > 0))
+                dbSet = dbSet.Take(model.Take.Value);
 
             var dbData = await dbSet.ToArrayAsync();
             var result = Mapper.Map<APIMODEL[]>(dbData); // For some reason I need to use an array, not IEnumerable.

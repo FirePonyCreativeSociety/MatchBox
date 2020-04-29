@@ -8,18 +8,21 @@
 
   <ItemGroup>
     <Compile Remove="Controllers\EventsController.cs" />
-    <Compile Remove="Controllers\GroupsController.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="MatchBox.db" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="Controllers\EventsController.cs" />
-    <None Include="Controllers\GroupsController.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

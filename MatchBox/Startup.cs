@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
 
 namespace MatchBox
@@ -34,7 +35,13 @@ namespace MatchBox
 
             // configure jwt authentication
             var settings = appSettingsSection.Get<MatchBoxSettings>();
-            var key = Encoding.ASCII.GetBytes(settings.Secret);
+            // TODO: this is not the ideal place to check... or is it?
+            if (string.IsNullOrWhiteSpace(settings.Jwt.IssuerSigningKey))
+                throw new Exception($"Unspecified Jwt IssuerSigningKey value in configuration.");
+
+            services.AddSingleton<MatchBoxSettings>(settings);
+
+            var key = Encoding.ASCII.GetBytes(settings.Jwt.IssuerSigningKey);
             services.AddAuthentication(x =>
             {
                 x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -50,7 +57,7 @@ namespace MatchBox
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,                    
                 };
             });
             
@@ -62,7 +69,7 @@ namespace MatchBox
             {
                 var connStr = Configuration.GetConnectionString(MatchBoxDbContext.DbConnectionName);
 
-                // Temporary: this check me pick an RDBMS type
+                // TODO: temporary. This check me pick an RDBMS type
                 if (connStr.Contains("server", System.StringComparison.OrdinalIgnoreCase) && (connStr.Contains("database", System.StringComparison.OrdinalIgnoreCase) || connStr.Contains("initial catalog", System.StringComparison.OrdinalIgnoreCase)))
                     opt.UseSqlServer(connStr);                
                 else
@@ -71,13 +78,25 @@ namespace MatchBox
 
             services.AddIdentity<DbUser, DbRole>(options =>
                     {
+                        options.Password.RequireLowercase = settings.Password.RequireLowercase;
+                        options.Password.RequireUppercase = settings.Password.RequireUppercase;
+                        options.Password.RequireNonAlphanumeric = settings.Password.RequireNonAlphanumeric;
+                        options.Password.RequireDigit = settings.Password.RequireDigit;
+
+                        options.Lockout.AllowedForNewUsers = true;
                         options.User.RequireUniqueEmail = true;
-                        //options.User.AllowedUserNameCharacters
+                        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(settings.User.LockoutDurationInMinutes);
+                        options.Lockout.MaxFailedAccessAttempts = settings.User.MaxFailedAccessAttempts;                                               
+                        options.User.AllowedUserNameCharacters = settings.User.AllowedUserNameCharacters;
                     })                
                     .AddEntityFrameworkStores<MatchBoxDbContext>()
                     .AddDefaultTokenProviders();
 
-            services.AddControllers();
+            services.AddControllers()
+                    .AddNewtonsoftJson(options =>
+                    {
+                        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                    });
 
             services.AddSwaggerGen(c => 
             {

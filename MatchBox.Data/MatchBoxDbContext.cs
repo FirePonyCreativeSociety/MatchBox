@@ -89,7 +89,7 @@ namespace MatchBox.Data
             builder.Entity<DbUserClaim>(entity =>
             {
                 entity.ToTable("UserClaims", schema: SecuritySchemaName);
-                entity.Property(e => e.UserId).HasColumnName("UserId");
+                //entity.Property(e => e.UserId).HasColumnName("UserId");
                 entity.Property(e => e.Id).HasColumnName("UserClaimId");
 
             });
@@ -97,7 +97,7 @@ namespace MatchBox.Data
             builder.Entity<DbUserLogin>(entity =>
             {
                 entity.ToTable("UserLogins", schema: SecuritySchemaName);
-                entity.Property(e => e.UserId).HasColumnName("UserId");
+                //entity.Property(e => e.UserId).HasColumnName("UserId");
 
             });
 
@@ -105,27 +105,31 @@ namespace MatchBox.Data
             {
                 entity.ToTable("RoleClaims", schema: SecuritySchemaName);
                 entity.Property(e => e.Id).HasColumnName("RoleClaimId");
-                entity.Property(e => e.RoleId).HasColumnName("RoleId");
+                //entity.Property(e => e.RoleId).HasColumnName("RoleId");
             });
 
             builder.Entity<DbUserRole>(entity =>
             {
                 entity.ToTable("UserRoles", schema: SecuritySchemaName);
-                entity.Property(e => e.UserId).HasColumnName("UserId");
-                entity.Property(e => e.RoleId).HasColumnName("RoleId");
+                //entity.Property(e => e.UserId).HasColumnName("UserId");
+                //entity.Property(e => e.RoleId).HasColumnName("RoleId");
 
             });
 
             builder.Entity<DbUserToken>(entity =>
             {
                 entity.ToTable("UserTokens", schema: SecuritySchemaName);
-                entity.Property(e => e.UserId).HasColumnName("UserId");
+                //entity.Property(e => e.UserId).HasColumnName("UserId");
 
             });
 
             builder.Entity<DbGroup>(entity =>
             {
                 entity.ToTable("Groups", schema: SecuritySchemaName);
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupId");
+                entity.HasIndex(nameof(DbGroup.Name))
+                      .IsUnique();
 
                 // Each Group can have many entries in the UserGroupRole join table
                 entity.HasMany(e => e.GroupUsers)
@@ -137,8 +141,9 @@ namespace MatchBox.Data
             builder.Entity<DbUserGroup>(entity =>
             {
                 entity.ToTable("UserGroups", schema: SecuritySchemaName);
-                entity.Property(e => e.UserId).HasColumnName("UserId");
-                entity.Property(e => e.GroupId).HasColumnName("GroupId");
+                entity.HasKey(nameof(DbUserGroup.UserId), nameof(DbUserGroup.GroupId));
+                //entity.Property(e => e.UserId).HasColumnName("UserId");
+                //entity.Property(e => e.GroupId).HasColumnName("GroupId");
             });
 
             builder.Entity<DbEvent>(entity =>
