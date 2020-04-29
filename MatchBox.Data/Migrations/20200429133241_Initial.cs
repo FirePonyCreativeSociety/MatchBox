@@ -22,6 +22,21 @@ namespace MatchBox.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Groups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedOn = table.Column<DateTime>(nullable: false),
+                    Title = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Groups", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -111,6 +126,30 @@ namespace MatchBox.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserGroups",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(nullable: false),
+                    GroupId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserGroups", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_UserGroups_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserGroups_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserLogins",
                 columns: table => new
                 {
@@ -192,6 +231,11 @@ namespace MatchBox.Data.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserGroups_GroupId",
+                table: "UserGroups",
+                column: "GroupId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserLogins_UserId",
                 table: "UserLogins",
                 column: "UserId");
@@ -226,6 +270,9 @@ namespace MatchBox.Data.Migrations
                 name: "UserClaims");
 
             migrationBuilder.DropTable(
+                name: "UserGroups");
+
+            migrationBuilder.DropTable(
                 name: "UserLogins");
 
             migrationBuilder.DropTable(
@@ -233,6 +280,9 @@ namespace MatchBox.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Groups");
 
             migrationBuilder.DropTable(
                 name: "Roles");

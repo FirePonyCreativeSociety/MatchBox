@@ -25,6 +25,9 @@ namespace MatchBox.Data
             base.OnConfiguring(optionsBuilder);
         }
 
+        public DbSet<DbGroup> Groups { get; set; }
+        public DbSet<DbUserGroup> UserGroups { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -57,6 +60,12 @@ namespace MatchBox.Data
                     .WithOne(e => e.User)
                     .HasForeignKey(ur => ur.UserId)
                     .IsRequired();
+
+                // Each User can have many UserGroups
+                b.HasMany(e => e.UserGroups)
+                 .WithOne(e => e.User)
+                 .HasForeignKey(ur => ur.UserId)
+                 .IsRequired();
             });
 
             builder.Entity<DbRole>(b =>
@@ -112,6 +121,24 @@ namespace MatchBox.Data
                 entity.ToTable("UserTokens", schema: SecuritySchemaName);
                 entity.Property(e => e.UserId).HasColumnName("UserId");
 
+            });
+
+            builder.Entity<DbGroup>(entity =>
+            {
+                entity.ToTable("Groups", schema: SecuritySchemaName);
+
+                // Each Group can have many entries in the UserGroupRole join table
+                entity.HasMany(e => e.GroupUsers)
+                    .WithOne(e => e.Group)
+                    .HasForeignKey(ur => ur.GroupId)
+                    .IsRequired();                
+            });
+
+            builder.Entity<DbUserGroup>(entity =>
+            {
+                entity.ToTable("UserGroups", schema: SecuritySchemaName);
+                entity.Property(e => e.UserId).HasColumnName("UserId");
+                entity.Property(e => e.GroupId).HasColumnName("GroupId");
             });
 
             builder.Entity<DbEvent>(entity =>

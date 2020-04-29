@@ -25,5 +25,6 @@ namespace MatchBox.Data.Models
         public virtual ICollection<DbUserLogin> Logins { get; set; }
         public virtual ICollection<DbUserToken> Tokens { get; set; }
         public virtual ICollection<DbUserRole> UserRoles { get; set; }
+        public virtual ICollection<DbUserGroup> UserGroups { get; set; }
     }
 }

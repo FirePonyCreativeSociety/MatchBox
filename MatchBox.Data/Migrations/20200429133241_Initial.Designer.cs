@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MatchBox.Data.Migrations
 {
     [DbContext(typeof(MatchBoxDbContext))]
-    [Migration("20200429130149_Initial")]
+    [Migration("20200429133241_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,6 +37,27 @@ namespace MatchBox.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("MatchBox.Data.Models.DbGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Groups");
                 });
 
             modelBuilder.Entity("MatchBox.Data.Models.DbRole", b =>
@@ -207,6 +228,23 @@ namespace MatchBox.Data.Migrations
                     b.ToTable("UserClaims");
                 });
 
+            modelBuilder.Entity("MatchBox.Data.Models.DbUserGroup", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnName("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnName("GroupId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("UserGroups");
+                });
+
             modelBuilder.Entity("MatchBox.Data.Models.DbUserLogin", b =>
                 {
                     b.Property<string>("LoginProvider")
@@ -279,6 +317,21 @@ namespace MatchBox.Data.Migrations
                 {
                     b.HasOne("MatchBox.Data.Models.DbUser", "User")
                         .WithMany("Claims")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("MatchBox.Data.Models.DbUserGroup", b =>
+                {
+                    b.HasOne("MatchBox.Data.Models.DbGroup", "Group")
+                        .WithMany("GroupUsers")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MatchBox.Data.Models.DbUser", "User")
+                        .WithMany("UserGroups")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
