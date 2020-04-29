@@ -34,7 +34,7 @@ namespace MatchBox.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Events","Security");
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("MatchBox.Data.Models.DbRole", b =>
@@ -67,7 +67,32 @@ namespace MatchBox.Data.Migrations
                         .HasName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("Roles","Security");
+                    b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("MatchBox.Data.Models.DbRoleClaim", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("RoleClaimId")
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnName("RoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RoleClaims");
                 });
 
             modelBuilder.Entity("MatchBox.Data.Models.DbUser", b =>
@@ -152,35 +177,10 @@ namespace MatchBox.Data.Migrations
                         .HasName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("Users","Security");
+                    b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("RoleClaimId")
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnName("RoleId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("RoleClaims","Security");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
+            modelBuilder.Entity("MatchBox.Data.Models.DbUserClaim", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -202,36 +202,10 @@ namespace MatchBox.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserClaims","Security");
+                    b.ToTable("UserClaims");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("DbUserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DbUserId");
-
-                    b.ToTable("IdentityUserClaim<string>");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
+            modelBuilder.Entity("MatchBox.Data.Models.DbUserLogin", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
@@ -250,10 +224,10 @@ namespace MatchBox.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserLogins","Security");
+                    b.ToTable("UserLogins");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
+            modelBuilder.Entity("MatchBox.Data.Models.DbUserRole", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnName("UserId")
@@ -267,10 +241,10 @@ namespace MatchBox.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRoles","Security");
+                    b.ToTable("UserRoles");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
+            modelBuilder.Entity("MatchBox.Data.Models.DbUserToken", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnName("UserId")
@@ -287,62 +261,55 @@ namespace MatchBox.Data.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("UserTokens","Security");
+                    b.ToTable("UserTokens");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
+            modelBuilder.Entity("MatchBox.Data.Models.DbRoleClaim", b =>
                 {
-                    b.HasOne("MatchBox.Data.Models.DbRole", null)
-                        .WithMany()
+                    b.HasOne("MatchBox.Data.Models.DbRole", "Role")
+                        .WithMany("RoleClaims")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
+            modelBuilder.Entity("MatchBox.Data.Models.DbUserClaim", b =>
                 {
-                    b.HasOne("MatchBox.Data.Models.DbUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
-                {
-                    b.HasOne("MatchBox.Data.Models.DbUser", null)
+                    b.HasOne("MatchBox.Data.Models.DbUser", "User")
                         .WithMany("Claims")
-                        .HasForeignKey("DbUserId");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
-                {
-                    b.HasOne("MatchBox.Data.Models.DbUser", null)
-                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
+            modelBuilder.Entity("MatchBox.Data.Models.DbUserLogin", b =>
                 {
-                    b.HasOne("MatchBox.Data.Models.DbRole", null)
-                        .WithMany()
+                    b.HasOne("MatchBox.Data.Models.DbUser", "User")
+                        .WithMany("Logins")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("MatchBox.Data.Models.DbUserRole", b =>
+                {
+                    b.HasOne("MatchBox.Data.Models.DbRole", "Role")
+                        .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MatchBox.Data.Models.DbUser", null)
-                        .WithMany()
+                    b.HasOne("MatchBox.Data.Models.DbUser", "User")
+                        .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
+            modelBuilder.Entity("MatchBox.Data.Models.DbUserToken", b =>
                 {
-                    b.HasOne("MatchBox.Data.Models.DbUser", null)
-                        .WithMany()
+                    b.HasOne("MatchBox.Data.Models.DbUser", "User")
+                        .WithMany("Tokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

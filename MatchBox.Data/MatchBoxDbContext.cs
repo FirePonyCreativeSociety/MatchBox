@@ -5,11 +5,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MatchBox.Data
 {
-    public class MatchBoxDbContext : IdentityDbContext<DbUser, DbRole, int>
+    public class MatchBoxDbContext : IdentityDbContext<
+        DbUser, DbRole, int,
+        DbUserClaim, DbUserRole, DbUserLogin,
+        DbRoleClaim, DbUserToken>
     {
         public const string DbConnectionName = "MatchBoxDb";
         public const string AdminUserName = "admin";
-        const string SecuritySchemaName = "Security";
+        const string SecuritySchemaName = null;// "Security";
 
         public MatchBoxDbContext(DbContextOptions<MatchBoxDbContext> options)
             : base(options)
@@ -24,28 +27,57 @@ namespace MatchBox.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);            
+            base.OnModelCreating(builder);
 
-            builder.Entity<DbUser>(entity =>
+            builder.Entity<DbUser>(b =>
             {
-                entity.ToTable(name: "Users", schema: SecuritySchemaName);
-                entity.Property(e => e.Id).HasColumnName("UserId");
+                b.ToTable(name: "Users", schema: SecuritySchemaName);
+                b.Property(e => e.Id).HasColumnName("UserId");
 
                 // Each User can have many UserClaims
-                //entity.HasMany(e => e.Claims)
-                //      .WithOne()
-                //      .HasForeignKey(uc => uc.UserId)
-                //      .IsRequired();
+                b.HasMany(e => e.Claims)
+                    .WithOne(e => e.User)
+                    .HasForeignKey(uc => uc.UserId)
+                    .IsRequired();
+
+                // Each User can have many UserLogins
+                b.HasMany(e => e.Logins)
+                    .WithOne(e => e.User)
+                    .HasForeignKey(ul => ul.UserId)
+                    .IsRequired();
+
+                // Each User can have many UserTokens
+                b.HasMany(e => e.Tokens)
+                    .WithOne(e => e.User)
+                    .HasForeignKey(ut => ut.UserId)
+                    .IsRequired();
+
+                // Each User can have many entries in the UserRole join table
+                b.HasMany(e => e.UserRoles)
+                    .WithOne(e => e.User)
+                    .HasForeignKey(ur => ur.UserId)
+                    .IsRequired();
             });
 
-            builder.Entity<DbRole>(entity =>
+            builder.Entity<DbRole>(b =>
             {
-                entity.ToTable(name: "Roles", schema: SecuritySchemaName);
-                entity.Property(e => e.Id).HasColumnName("RoleId");
+                b.ToTable(name: "Roles", schema: SecuritySchemaName);
+                b.Property(e => e.Id).HasColumnName("RoleId");
 
+                // Each Role can have many entries in the UserRole join table
+                b.HasMany(e => e.UserRoles)
+                    .WithOne(e => e.Role)
+                    .HasForeignKey(ur => ur.RoleId)
+                    .IsRequired();
+
+                // Each Role can have many associated RoleClaims
+                b.HasMany(e => e.RoleClaims)
+                    .WithOne(e => e.Role)
+                    .HasForeignKey(rc => rc.RoleId)
+                    .IsRequired();
             });
 
-            builder.Entity<IdentityUserClaim<int>>(entity =>
+            builder.Entity<DbUserClaim>(entity =>
             {
                 entity.ToTable("UserClaims", schema: SecuritySchemaName);
                 entity.Property(e => e.UserId).HasColumnName("UserId");
@@ -53,21 +85,21 @@ namespace MatchBox.Data
 
             });
 
-            builder.Entity<IdentityUserLogin<int>>(entity =>
+            builder.Entity<DbUserLogin>(entity =>
             {
                 entity.ToTable("UserLogins", schema: SecuritySchemaName);
                 entity.Property(e => e.UserId).HasColumnName("UserId");
 
             });
 
-            builder.Entity<IdentityRoleClaim<int>>(entity =>
+            builder.Entity<DbRoleClaim>(entity =>
             {
                 entity.ToTable("RoleClaims", schema: SecuritySchemaName);
                 entity.Property(e => e.Id).HasColumnName("RoleClaimId");
                 entity.Property(e => e.RoleId).HasColumnName("RoleId");
             });
 
-            builder.Entity<IdentityUserRole<int>>(entity =>
+            builder.Entity<DbUserRole>(entity =>
             {
                 entity.ToTable("UserRoles", schema: SecuritySchemaName);
                 entity.Property(e => e.UserId).HasColumnName("UserId");
@@ -75,7 +107,7 @@ namespace MatchBox.Data
 
             });
 
-            builder.Entity<IdentityUserToken<int>>(entity =>
+            builder.Entity<DbUserToken>(entity =>
             {
                 entity.ToTable("UserTokens", schema: SecuritySchemaName);
                 entity.Property(e => e.UserId).HasColumnName("UserId");
@@ -87,6 +119,6 @@ namespace MatchBox.Data
                 entity.ToTable("Events", schema: SecuritySchemaName);
                 entity.HasKey(nameof(DbEvent.Id));
             });
-        }        
+        }
     }
 }

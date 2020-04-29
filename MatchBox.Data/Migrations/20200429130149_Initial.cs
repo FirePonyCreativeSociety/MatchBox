@@ -7,12 +7,8 @@ namespace MatchBox.Data.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.EnsureSchema(
-                name: "Security");
-
             migrationBuilder.CreateTable(
                 name: "Events",
-                schema: "Security",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -27,7 +23,6 @@ namespace MatchBox.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Roles",
-                schema: "Security",
                 columns: table => new
                 {
                     RoleId = table.Column<int>(nullable: false)
@@ -44,7 +39,6 @@ namespace MatchBox.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Users",
-                schema: "Security",
                 columns: table => new
                 {
                     UserId = table.Column<int>(nullable: false)
@@ -76,7 +70,6 @@ namespace MatchBox.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "RoleClaims",
-                schema: "Security",
                 columns: table => new
                 {
                     RoleClaimId = table.Column<int>(nullable: false)
@@ -91,38 +84,13 @@ namespace MatchBox.Data.Migrations
                     table.ForeignKey(
                         name: "FK_RoleClaims_Roles_RoleId",
                         column: x => x.RoleId,
-                        principalSchema: "Security",
                         principalTable: "Roles",
                         principalColumn: "RoleId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "IdentityUserClaim<string>",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(nullable: true),
-                    ClaimType = table.Column<string>(nullable: true),
-                    ClaimValue = table.Column<string>(nullable: true),
-                    DbUserId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_IdentityUserClaim<string>", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_IdentityUserClaim<string>_Users_DbUserId",
-                        column: x => x.DbUserId,
-                        principalSchema: "Security",
-                        principalTable: "Users",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UserClaims",
-                schema: "Security",
                 columns: table => new
                 {
                     UserClaimId = table.Column<int>(nullable: false)
@@ -137,7 +105,6 @@ namespace MatchBox.Data.Migrations
                     table.ForeignKey(
                         name: "FK_UserClaims_Users_UserId",
                         column: x => x.UserId,
-                        principalSchema: "Security",
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
@@ -145,7 +112,6 @@ namespace MatchBox.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "UserLogins",
-                schema: "Security",
                 columns: table => new
                 {
                     LoginProvider = table.Column<string>(nullable: false),
@@ -159,7 +125,6 @@ namespace MatchBox.Data.Migrations
                     table.ForeignKey(
                         name: "FK_UserLogins_Users_UserId",
                         column: x => x.UserId,
-                        principalSchema: "Security",
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
@@ -167,7 +132,6 @@ namespace MatchBox.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "UserRoles",
-                schema: "Security",
                 columns: table => new
                 {
                     UserId = table.Column<int>(nullable: false),
@@ -179,14 +143,12 @@ namespace MatchBox.Data.Migrations
                     table.ForeignKey(
                         name: "FK_UserRoles_Roles_RoleId",
                         column: x => x.RoleId,
-                        principalSchema: "Security",
                         principalTable: "Roles",
                         principalColumn: "RoleId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserRoles_Users_UserId",
                         column: x => x.UserId,
-                        principalSchema: "Security",
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
@@ -194,7 +156,6 @@ namespace MatchBox.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "UserTokens",
-                schema: "Security",
                 columns: table => new
                 {
                     UserId = table.Column<int>(nullable: false),
@@ -208,26 +169,18 @@ namespace MatchBox.Data.Migrations
                     table.ForeignKey(
                         name: "FK_UserTokens_Users_UserId",
                         column: x => x.UserId,
-                        principalSchema: "Security",
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_IdentityUserClaim<string>_DbUserId",
-                table: "IdentityUserClaim<string>",
-                column: "DbUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",
-                schema: "Security",
                 table: "RoleClaims",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
-                schema: "Security",
                 table: "Roles",
                 column: "NormalizedName",
                 unique: true,
@@ -235,31 +188,26 @@ namespace MatchBox.Data.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserClaims_UserId",
-                schema: "Security",
                 table: "UserClaims",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserLogins_UserId",
-                schema: "Security",
                 table: "UserLogins",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_RoleId",
-                schema: "Security",
                 table: "UserRoles",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
-                schema: "Security",
                 table: "Users",
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
-                schema: "Security",
                 table: "Users",
                 column: "NormalizedUserName",
                 unique: true,
@@ -269,39 +217,28 @@ namespace MatchBox.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "IdentityUserClaim<string>");
+                name: "Events");
 
             migrationBuilder.DropTable(
-                name: "Events",
-                schema: "Security");
+                name: "RoleClaims");
 
             migrationBuilder.DropTable(
-                name: "RoleClaims",
-                schema: "Security");
+                name: "UserClaims");
 
             migrationBuilder.DropTable(
-                name: "UserClaims",
-                schema: "Security");
+                name: "UserLogins");
 
             migrationBuilder.DropTable(
-                name: "UserLogins",
-                schema: "Security");
+                name: "UserRoles");
 
             migrationBuilder.DropTable(
-                name: "UserRoles",
-                schema: "Security");
+                name: "UserTokens");
 
             migrationBuilder.DropTable(
-                name: "UserTokens",
-                schema: "Security");
+                name: "Roles");
 
             migrationBuilder.DropTable(
-                name: "Roles",
-                schema: "Security");
-
-            migrationBuilder.DropTable(
-                name: "Users",
-                schema: "Security");
+                name: "Users");
         }
     }
 }

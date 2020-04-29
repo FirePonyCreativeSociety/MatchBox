@@ -59,7 +59,15 @@ namespace MatchBox
 
             // Database
             services.AddDbContext<MatchBoxDbContext>(opt =>
-               opt.UseSqlServer(Configuration.GetConnectionString(MatchBoxDbContext.DbConnectionName)));
+            {
+                var connStr = Configuration.GetConnectionString(MatchBoxDbContext.DbConnectionName);
+
+                // Temporary: this check me pick an RDBMS type
+                if (connStr.Contains("server", System.StringComparison.OrdinalIgnoreCase) && (connStr.Contains("database", System.StringComparison.OrdinalIgnoreCase) || connStr.Contains("initial catalog", System.StringComparison.OrdinalIgnoreCase)))
+                    opt.UseSqlServer(connStr);                
+                else
+                    opt.UseSqlite(connStr); 
+            });
 
             services.AddIdentity<DbUser, DbRole>(options =>
                     {
