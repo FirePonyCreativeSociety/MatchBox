@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MatchBox.Services.Email
 {
-    public class EmailSettings
+    public class EmailConfiguration
     {
         public string From { get; set; }
         public string SmtpServer { get; set; }

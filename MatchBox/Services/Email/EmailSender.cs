@@ -6,9 +6,9 @@ namespace MatchBox.Services.Email
 {
     public class EmailSender : IEmailSender
     {
-        private readonly EmailSettings _emailConfig;
+        private readonly EmailConfiguration _emailConfig;
 
-        public EmailSender(EmailSettings settings)
+        public EmailSender(EmailConfiguration settings)
         {
             _emailConfig = settings;
         }        

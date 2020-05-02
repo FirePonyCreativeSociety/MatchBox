@@ -7,12 +7,14 @@ using MatchBox.Models.Mapping;
 using MatchBox.Services.Email;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -25,7 +27,7 @@ namespace MatchBox.Tests
 
         public IServiceProvider ServiceProvider { get; private set; }        
 
-        IConfigurationRoot GetConfiguration()
+        IConfigurationRoot BuildConfiguration()
         {
             return new ConfigurationBuilder()
                         .AddJsonFile("testsettings.json", optional: false)
@@ -35,39 +37,28 @@ namespace MatchBox.Tests
 
         public async Task InitializeAsync()
         {
-            var serviceCollection = new ServiceCollection();
-            var cfg = GetConfiguration();
+            // Creates the IConfiguration instance appropriately for tests
+            var cfg = BuildConfiguration();
+            var services = new ServiceCollection();
+            services.AddSingleton(cfg);
 
-            serviceCollection.AddSingleton(cfg);
+            // Adds all controllers from main assembly. By default, the controllers are not loaded so this is necessary.
+            // AddControllers() and AddApplicationPart().AddControllers() did not work.
+            var controllers = typeof(UsersController).Assembly.ExportedTypes.Where(x => !x.IsAbstract && typeof(ControllerBase).IsAssignableFrom(x)).ToList();
+            controllers.ForEach(c => services.AddTransient(c));
 
+            // Executes the same ConfigureServices() as the MatchBox application
             var startup = new MatchBox.Startup(cfg);
-
-            //serviceCollection
-            //    .AddDbContext<MatchBoxDbContext>(options => options.UseSqlite(ConnectionString),
-            //        ServiceLifetime.Transient);
-            //
-            serviceCollection.AddLogging(builder =>
+            startup.ConfigureServices(services);
+            
+            // Adds logging?
+            services.AddLogging(builder =>
             {
                 builder.AddConsole();
             });
-            //
-            //serviceCollection.AddIdentity<DbUser, DbRole>(options =>
-            //{
-            //    options.Password.RequireLowercase = true;
-            //    options.Password.RequireUppercase = true;
-            //    options.Password.RequireNonAlphanumeric = true;
-            //    options.Password.RequireDigit = true;
-            //    
-            //    options.Lockout.AllowedForNewUsers = true;
-            //    options.User.RequireUniqueEmail = true;
-            //    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
-            //    options.Lockout.MaxFailedAccessAttempts = 3;
-            //    //options.User.AllowedUserNameCharacters = settings.User.AllowedUserNameCharacters;
-            //})
-            //        .AddEntityFrameworkStores<MatchBoxDbContext>()
-            //        .AddDefaultTokenProviders();
-            //
-            serviceCollection.AddTransient<IHttpContextAccessor>(
+            
+            // This is necessary for controller testing
+            services.AddTransient<IHttpContextAccessor>(
                 sp => 
                 {
                     return new HttpContextAccessor 
@@ -79,20 +70,10 @@ namespace MatchBox.Tests
                     };
                 });
 
+            // Builds the service provider
+            ServiceProvider = services.BuildServiceProvider();
 
-
-            //
-            //serviceCollection.AddAutoMapper(typeof(APIAutoMapProfile));
-            //serviceCollection.AddTransient<IJwtProducer, JwtProducer>();
-            //serviceCollection.AddTransient<IEmailSender, EmailSender>();
-            //
-            //serviceCollection.AddTransient<UsersController>();
-            //serviceCollection.AddTransient<EventsController>();
-            //serviceCollection.AddTransient<GroupsController>();
-            //serviceCollection.AddTransient<UtilityController>();
-
-            ServiceProvider = serviceCollection.BuildServiceProvider();
-
+            // Now initializes the temporary db
             var init = new MatchBoxDbInitializer(ServiceProvider);
             await init.Initialize();
         }

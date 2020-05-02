@@ -37,4 +37,10 @@
     <ProjectReference Include="..\MatchBox\MatchBox.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="UsersControllerTests.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
+
 </Project>

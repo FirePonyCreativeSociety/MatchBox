@@ -4,6 +4,7 @@ using MatchBox.Data;
 using MatchBox.Data.Models;
 using MatchBox.Internal;
 using MatchBox.Models.Mapping;
+using MatchBox.Services.Email;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,18 +32,20 @@ namespace MatchBox
         public void ConfigureServices(IServiceCollection services)
         {
             // Configure strongly typed settings objects
-            var appSettingsSection = Configuration.GetSection(nameof(MatchBoxConfiguration.AppSettingsSectionName));
+            var appSettingsSection = Configuration.GetSection(MatchBoxConfiguration.AppSettingsSectionName);
             services.Configure<MatchBoxConfiguration>(appSettingsSection);
-
-            // Configure jwt authentication
             var mbCfg = appSettingsSection.Get<MatchBoxConfiguration>();
-            
+            services.AddSingleton<MatchBoxConfiguration>(mbCfg);
+            services.AddSingleton<EmailConfiguration>(mbCfg.Email);
+            services.AddSingleton<JwtConfiguration>(mbCfg.Jwt);
+            services.AddSingleton<PasswordConfiguration>(mbCfg.Password);
+            services.AddSingleton<UserConfiguration>(mbCfg.User);
+
+            // Configure jwt authentication            
             // TODO: this is not the ideal place to check... or is it?
             if (string.IsNullOrWhiteSpace(mbCfg.Jwt.IssuerSigningKey))
                 throw new Exception($"Unspecified Jwt IssuerSigningKey value in configuration.");
-
-            services.AddSingleton<MatchBoxConfiguration>(mbCfg);
-            
+                        
             var key = Encoding.ASCII.GetBytes(mbCfg.Jwt.IssuerSigningKey);
             services.AddAuthentication(x =>
             {
@@ -116,6 +119,7 @@ namespace MatchBox
             });
 
             services.AddTransient<IJwtProducer, JwtProducer>();
+            services.AddTransient<IEmailSender, EmailSender>();            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
