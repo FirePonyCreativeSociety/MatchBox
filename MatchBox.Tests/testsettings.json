@@ -31,11 +31,11 @@
       "RequireDigit": "false"
     },
     "Email": {
-      "From": "matchbox@matchbox.com",
+      "From": "afederici75@gmail.com",
       "SmtpServer": "smtp.gmail.com",
       "Port": 465,
-      "Username": "codemazetest@gmail.com",
-      "Password": "our test password"
+      "Username": "afederici75@gmail.com",
+      "Password": "G7!5z5m0"
     }
   }
 }

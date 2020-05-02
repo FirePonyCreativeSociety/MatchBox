@@ -1,4 +1,5 @@
-﻿using MatchBox.Internal;
+﻿using MatchBox.Configuration;
+using MatchBox.Internal;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,13 +11,13 @@ namespace MatchBox.Controllers
 {
     public class UtilityController : MatchBoxControllerBase
     {
-        public UtilityController(MatchBoxSettings settings)
+        public UtilityController(MatchBoxConfiguration configuration)
             : base()
         {
-            Settings = settings;
+            Configuration = configuration;
         }
 
-        public MatchBoxSettings Settings { get; }
+        public MatchBoxConfiguration Configuration { get; }
 
         [AllowAnonymous]
         [HttpGet()]
@@ -24,8 +25,8 @@ namespace MatchBox.Controllers
         {
             var tmp = new 
             { 
-                PasswordSettings = Settings.Password,
-                UserSettings = Settings.User
+                PasswordSettings = Configuration.Password,
+                UserSettings = Configuration.User
             };
 
             return Ok(tmp);

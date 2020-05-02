@@ -27,6 +27,7 @@ namespace MatchBox.Data
 
         public DbSet<DbGroup> Groups { get; set; }
         public DbSet<DbUserGroup> UserGroups { get; set; }
+        public DbSet<DbEvent> Events { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

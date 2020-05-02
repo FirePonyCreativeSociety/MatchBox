@@ -1,4 +1,5 @@
-﻿using MatchBox.Data.Models;
+﻿using MatchBox.Configuration;
+using MatchBox.Data.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -13,18 +14,18 @@ namespace MatchBox.Internal
 {
     public class JwtProducer : IJwtProducer
     {
-        public JwtProducer(IOptions<MatchBoxSettings> settings)
+        public JwtProducer(IOptions<MatchBoxConfiguration> settings)
             : base()
         {
-            Settings = settings.Value;
+            Configuration = settings.Value;
         }
 
-        public MatchBoxSettings Settings { get; }
+        public MatchBoxConfiguration Configuration { get; }
 
         public string Generate(DbUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(Settings.Jwt.IssuerSigningKey);
+            var key = Encoding.ASCII.GetBytes(Configuration.Jwt.IssuerSigningKey);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]

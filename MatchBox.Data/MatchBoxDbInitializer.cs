@@ -25,9 +25,9 @@ namespace MatchBox.Data
             RoleManager = serviceProvider.GetRequiredService<RoleManager<DbRole>>();
         }
 
-        public MatchBoxDbContext Context { get; }
-        public UserManager<DbUser> UserManager { get; }
-        public RoleManager<DbRole> RoleManager { get; }
+        protected MatchBoxDbContext Context { get; }
+        protected UserManager<DbUser> UserManager { get; }
+        protected RoleManager<DbRole> RoleManager { get; }
 
         public async Task Initialize() 
         {
@@ -47,11 +47,25 @@ namespace MatchBox.Data
             await GenerateDefaultUsers();
         }
 
-        const string AleFUserName = "AleF";
-        const string ZacUserName = "Zac";
-        const string MrKUserName = "MrK";
-        const string MetaUserName = "Meta";
-        const string GrinsUserName = "Grins";
+        public const string AleFUserName = "AleF";
+        public const string ZacUserName = "Zac";
+        public const string MrKUserName = "MrK";
+        public const string MetaUserName = "Meta";
+        public const string GrinsUserName = "Grins";
+
+        public static IEnumerable<string> GetDefaultUserNames()
+        {
+            return new[] 
+            {
+                AleFUserName,
+                ZacUserName,
+                MrKUserName,
+                MetaUserName,
+                GrinsUserName,
+            };
+        }
+
+        public const string DefaultPassword = "Pass@1234";
 
         async Task AddUser(
             string userName, 
@@ -73,7 +87,7 @@ namespace MatchBox.Data
                 DateOfBirth = dateOfBirth
             };
 
-            var result = await UserManager.CreateAsync(newUser, "password");
+            var result = await UserManager.CreateAsync(newUser, DefaultPassword);
             if (!result.Succeeded)
                 throw new System.Exception($"Could not create the default user '{userName}'.");
 
@@ -107,7 +121,7 @@ namespace MatchBox.Data
                           null);
 
             // AleF
-            await AddUser(userName: AleFUserName, email: "myemail@gmail.com", dateOfBirth: new DateTime(1975, 12, 8), firstName: "Federico", middleName: "Alessandro", lastName: "Federici",
+            await AddUser(userName: AleFUserName, email: "afederici75@gmail.com", dateOfBirth: new DateTime(1975, 12, 8), firstName: "Federico", middleName: "Alessandro", lastName: "Federici",
                           new[] { AdminRoleName }, 
                           new[] { SonOfABitGroupName });
 
@@ -147,8 +161,17 @@ namespace MatchBox.Data
             //return list;
         }
 
-        const string AdminRoleName = "Administrators";
-        const string ModerangersRoleName = "Moderangers";
+        public const string AdminRoleName = "Administrators";
+        public const string ModerangersRoleName = "Moderangers";
+
+        public static IEnumerable<string> GetDefaultRoleNames()
+        {
+            return new[]
+            {
+                AdminRoleName,
+                ModerangersRoleName,
+            };
+        }
 
         async Task AddRole(string name, string description)
         {
@@ -169,9 +192,19 @@ namespace MatchBox.Data
         }
 
 
-        const string SonOfABitGroupName = "Son Of a Bit";
-        const string EdmCafeGroupName = "EDM Cafe";
-        const string SanctuaryBitGroupName = "Sanctuary";
+        public const string SonOfABitGroupName = "Son Of a Bit";
+        public const string EdmCafeGroupName = "EDM Cafe";
+        public const string SanctuaryBitGroupName = "Sanctuary";
+
+        public static IEnumerable<string> GetDefaultGroupNames()
+        {
+            return new[]
+            {
+                SonOfABitGroupName,
+                EdmCafeGroupName,
+                SanctuaryBitGroupName,
+            };
+        }
 
         async Task AddGroup(string name, string description)
         {

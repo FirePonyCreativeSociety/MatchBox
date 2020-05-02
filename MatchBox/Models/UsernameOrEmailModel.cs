@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace MatchBox.Models
 {
-    public class LoginModel : UsernameOrEmailModel
+    public class UsernameOrEmailModel
     {
         [Required]
-        public string Password { get; set; }
+        public string UsernameOrEmail { get; set; }        
     }
 }

@@ -5,6 +5,7 @@ using MatchBox.Models;
 using MatchBox.Models.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -21,8 +22,8 @@ namespace MatchBox.Controllers
         public RESTControllerBase(MatchBoxDbContext dbContext, IMapper mapper)
             : base()
         {
-            DbContext = dbContext;
-            Mapper = mapper;
+            DbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         protected MatchBoxDbContext DbContext { get; }

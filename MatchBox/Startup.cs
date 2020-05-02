@@ -1,8 +1,9 @@
 using AutoMapper;
+using MatchBox.Configuration;
 using MatchBox.Data;
 using MatchBox.Data.Models;
 using MatchBox.Internal;
-using MatchBox.Model.Mapping;
+using MatchBox.Models.Mapping;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -30,18 +31,19 @@ namespace MatchBox
         public void ConfigureServices(IServiceCollection services)
         {
             // Configure strongly typed settings objects
-            var appSettingsSection = Configuration.GetSection(nameof(MatchBoxSettings));
-            services.Configure<MatchBoxSettings>(appSettingsSection);
+            var appSettingsSection = Configuration.GetSection(nameof(MatchBoxConfiguration.AppSettingsSectionName));
+            services.Configure<MatchBoxConfiguration>(appSettingsSection);
 
-            // configure jwt authentication
-            var settings = appSettingsSection.Get<MatchBoxSettings>();
+            // Configure jwt authentication
+            var mbCfg = appSettingsSection.Get<MatchBoxConfiguration>();
+            
             // TODO: this is not the ideal place to check... or is it?
-            if (string.IsNullOrWhiteSpace(settings.Jwt.IssuerSigningKey))
+            if (string.IsNullOrWhiteSpace(mbCfg.Jwt.IssuerSigningKey))
                 throw new Exception($"Unspecified Jwt IssuerSigningKey value in configuration.");
 
-            services.AddSingleton<MatchBoxSettings>(settings);
-
-            var key = Encoding.ASCII.GetBytes(settings.Jwt.IssuerSigningKey);
+            services.AddSingleton<MatchBoxConfiguration>(mbCfg);
+            
+            var key = Encoding.ASCII.GetBytes(mbCfg.Jwt.IssuerSigningKey);
             services.AddAuthentication(x =>
             {
                 x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -78,16 +80,16 @@ namespace MatchBox
 
             services.AddIdentity<DbUser, DbRole>(options =>
                     {
-                        options.Password.RequireLowercase = settings.Password.RequireLowercase;
-                        options.Password.RequireUppercase = settings.Password.RequireUppercase;
-                        options.Password.RequireNonAlphanumeric = settings.Password.RequireNonAlphanumeric;
-                        options.Password.RequireDigit = settings.Password.RequireDigit;
+                        options.Password.RequireLowercase = mbCfg.Password.RequireLowercase;
+                        options.Password.RequireUppercase = mbCfg.Password.RequireUppercase;
+                        options.Password.RequireNonAlphanumeric = mbCfg.Password.RequireNonAlphanumeric;
+                        options.Password.RequireDigit = mbCfg.Password.RequireDigit;
 
                         options.Lockout.AllowedForNewUsers = true;
                         options.User.RequireUniqueEmail = true;
-                        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(settings.User.LockoutDurationInMinutes);
-                        options.Lockout.MaxFailedAccessAttempts = settings.User.MaxFailedAccessAttempts;                                               
-                        options.User.AllowedUserNameCharacters = settings.User.AllowedUserNameCharacters;
+                        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(mbCfg.User.LockoutDurationInMinutes);
+                        options.Lockout.MaxFailedAccessAttempts = mbCfg.User.MaxFailedAccessAttempts;                                               
+                        options.User.AllowedUserNameCharacters = mbCfg.User.AllowedUserNameCharacters;
                     })                
                     .AddEntityFrameworkStores<MatchBoxDbContext>()
                     .AddDefaultTokenProviders();

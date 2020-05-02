@@ -11,5 +11,6 @@ namespace MatchBox.Data.Models
         public DateTime CreatedOn { get; set; } = DateTime.Now;
         [Required]
         public string Title { get; set; }        
+        public byte[] Data { get; set; }
     }
 }
