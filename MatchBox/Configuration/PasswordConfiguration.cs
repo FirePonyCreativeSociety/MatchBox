@@ -6,6 +6,6 @@
         public bool RequireLowercase { get; set; } = false;
         public bool RequireUppercase { get; set; } = false;
         public bool RequireNonAlphanumeric { get; set; } = false;
-        public bool RequireDigit { get; set; } = false;
+        public bool RequireDigit { get; set; } = false;        
     }    
 }

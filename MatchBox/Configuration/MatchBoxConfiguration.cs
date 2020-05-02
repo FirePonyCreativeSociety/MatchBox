@@ -17,5 +17,7 @@ namespace MatchBox.Configuration
         public PasswordConfiguration Password { get; set; } = new PasswordConfiguration();
 
         public EmailConfiguration Email { get; set; } = new EmailConfiguration();
+
+        
     }
 }

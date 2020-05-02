@@ -9,6 +9,8 @@ using MatchBox.Controllers;
 using System.Threading.Tasks;
 using MatchBox.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
 
 namespace MatchBox.Tests
 {
@@ -42,7 +44,11 @@ namespace MatchBox.Tests
         public async Task ResetPasswordWorks()
         {
             var ctrl = CreateController();
-
+            
+            var ac = new ActionContext() { 
+                
+            };
+            ctrl.Url = new UrlHelper(ac);
             var forgotResp = await ctrl.ForgotPassword(new UsernameOrEmailModel
             { 
                 UsernameOrEmail = "alef",                

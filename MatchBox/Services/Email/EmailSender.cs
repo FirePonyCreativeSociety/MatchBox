@@ -5,18 +5,18 @@ using System.Threading.Tasks;
 namespace MatchBox.Services.Email
 {
     public class EmailSender : IEmailSender
-    {
-        private readonly EmailConfiguration _emailConfig;
-
-        public EmailSender(EmailConfiguration settings)
+    {        
+        public EmailSender(EmailConfiguration configuration)
         {
-            _emailConfig = settings;
-        }        
-        
+            Configuration = configuration;
+        }
+
+        public EmailConfiguration Configuration { get; }
+
         private MimeMessage CreateEmailMessage(Message message)
         {
             var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress(_emailConfig.From));
+            emailMessage.From.Add(new MailboxAddress(Configuration.From));
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
@@ -30,9 +30,9 @@ namespace MatchBox.Services.Email
             {
                 try
                 {
-                    await client.ConnectAsync(_emailConfig.SmtpServer, _emailConfig.Port, true);
-                    client.AuthenticationMechanisms.Remove("XOAUTH2");
-                    await client.AuthenticateAsync(_emailConfig.UserName, _emailConfig.Password);
+                    await client.ConnectAsync(Configuration.SmtpServer, Configuration.Port, Configuration.UseSSL);
+                    //client.AuthenticationMechanisms.Remove("XOAUTH2");
+                    await client.AuthenticateAsync(Configuration.UserName, Configuration.Password);
 
                     await client.SendAsync(CreateEmailMessage(message));
                 }

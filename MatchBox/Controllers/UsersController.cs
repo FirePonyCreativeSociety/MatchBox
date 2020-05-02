@@ -39,6 +39,7 @@ namespace MatchBox.Controllers
         public UserManager<DbUser> UserManager { get; }
         public SignInManager<DbUser> SignInManager { get; }
         public IEmailSender EmailSender { get; }
+        public EmailConfiguration EmailConfiguration { get; }
 
         protected override IQueryable<DbUser> ControllerDbSet => DbContext.Users;
 
@@ -69,32 +70,34 @@ namespace MatchBox.Controllers
             return Ok(jwt);
         }
 
-        // https://code-maze.com/password-reset-aspnet-core-identity/
+        // https://code-maze.com/password-reset-aspnet-core-identity/        
         [AllowAnonymous]
         [HttpPost(nameof(ForgotPassword))]
-        public async Task<IActionResult> ForgotPassword([FromBody] UsernameOrEmailModel model)
+        public async Task<ForgotPasswordResponse> ForgotPassword([FromBody] UsernameOrEmailModel model)
         {
             var user = await FindUserByUsernameOrEmail(model.UsernameOrEmail);
             if (user == null)
-                return Ok();
+                return null;
 
-            var token = await UserManager.GeneratePasswordResetTokenAsync(user);
-            var callback = Url.Action(nameof(ResetPassword), nameof(UsersController), new { token, email = user.Email }, Request.Scheme);
+            //var message = new Message(new string[] { user.Email }, "Reset password token", callback);
+            //await EmailSender.SendEmailAsync(message);
 
-            var message = new Message(new string[] { user.Email }, "Reset password token", callback);
-            await EmailSender.SendEmailAsync(message);
-
-            return Ok();
+            return new ForgotPasswordResponse
+            { 
+                Email = user.Email,
+                Token = await UserManager.GeneratePasswordResetTokenAsync(user)
+            };
         }
 
+        [AllowAnonymous]
         [HttpPost(nameof(ResetPassword))]
-        public async Task<IActionResult> ResetPassword(ResetPasswordModel resetPasswordModel)
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel resetPasswordModel)
         {
             var user = await FindUserByUsernameOrEmail(resetPasswordModel.Email);
             if (user == null)
                 return Ok();
 
-            var resetPassResult = await UserManager.ResetPasswordAsync(user, resetPasswordModel.Token, resetPasswordModel.Password);
+            var resetPassResult = await UserManager.ResetPasswordAsync(user, resetPasswordModel.Token, resetPasswordModel.NewPassword);
             if (!resetPassResult.Succeeded)
             {
                 foreach (var error in resetPassResult.Errors)

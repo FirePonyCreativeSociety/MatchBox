@@ -116,17 +116,17 @@ namespace MatchBox.Data
         async Task GenerateDefaultUsers()
         {
             // Admin
-            await AddUser(userName: MatchBoxDbContext.AdminUserName, email: "me@thisserver.net", dateOfBirth: DateTime.Now, firstName: "System", middleName: null, lastName: "Administrator",
+            await AddUser(userName: MatchBoxDbContext.AdminUserName, email: "adminuser@devtests.local", dateOfBirth: DateTime.Now, firstName: "System", middleName: null, lastName: "Administrator",
                           new[] { AdminRoleName },
                           null);
 
             // AleF
-            await AddUser(userName: AleFUserName, email: "afederici75@gmail.com", dateOfBirth: new DateTime(1975, 12, 8), firstName: "Federico", middleName: "Alessandro", lastName: "Federici",
+            await AddUser(userName: AleFUserName, email: "user1@devtests.local", dateOfBirth: new DateTime(1975, 12, 8), firstName: "Federico", middleName: "Alessandro", lastName: "Federici",
                           new[] { AdminRoleName }, 
                           new[] { SonOfABitGroupName });
 
             // Zac
-            await AddUser(userName: ZacUserName, email: "zak@lucasarts.net", dateOfBirth: new DateTime(1985, 2, 3), firstName: "Zac", middleName: null, lastName: "McKracken",
+            await AddUser(userName: ZacUserName, email: "user2@devtests.local", dateOfBirth: new DateTime(1985, 2, 3), firstName: "Zac", middleName: null, lastName: "McKracken",
                           new[] { AdminRoleName }, 
                           new [] { EdmCafeGroupName });
 
