@@ -43,11 +43,11 @@ namespace MatchBox.Controllers
 
         protected override IQueryable<DbUser> ControllerDbSet => DbContext.Users;
 
-        async Task<DbUser> FindUserByUsernameOrEmail(string usernameOrEmail)
-        {
-            var user = await UserManager.FindByNameAsync(usernameOrEmail);
-            return user ?? await UserManager.FindByEmailAsync(usernameOrEmail);
-        }
+        //async Task<DbUser> FindUserByUsernameOrEmail(string usernameOrEmail)
+        //{
+        //    var user = await UserManager.FindByNameAsync(usernameOrEmail);
+        //    return user ?? await UserManager.FindByEmailAsync(usernameOrEmail);
+        //}
 
         [HttpPost(nameof(Login))]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -57,25 +57,25 @@ namespace MatchBox.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await FindUserByUsernameOrEmail(model.UsernameOrEmail);
-            if (user == null)
+            var userLookup = await UserManager.FindUserByUsernameOrEmail(model.UsernameOrEmail);
+            if (!userLookup.Found)
                 return BadRequest(new { message = BadLoginMessage });
 
-            var result = await SignInManager.PasswordSignInAsync(user, model.Password, false, true);
+            var signInResult = await SignInManager.PasswordSignInAsync(userLookup.Value, model.Password, false, true);
 
-            if (result.IsLockedOut)
+            if (signInResult.IsLockedOut)
                 return BadRequest(new { message = UserLockedOutMessage });
 
-            if (!result.Succeeded)
+            if (!signInResult.Succeeded)
                 return BadRequest(new { message = BadLoginMessage });
 
-            var jwt = JwtProducer.Generate(user);
+            var jwt = JwtProducer.Generate(userLookup.Value);
 
             return Ok(new LoginResponseModel 
             { 
-                UserName = user.UserName,
-                Email = user.Email,
-                Jwt = JwtProducer.Generate(user)
+                UserName = userLookup.Value.UserName,
+                Email = userLookup.Value.Email,
+                Jwt = JwtProducer.Generate(userLookup.Value)
             });
         }
         
@@ -89,14 +89,14 @@ namespace MatchBox.Controllers
                 return BadRequest(ModelState);
 
             // https://code-maze.com/password-reset-aspnet-core-identity/        
-            var user = await FindUserByUsernameOrEmail(model.UsernameOrEmail);
-            if (user == null)
+            var user = await UserManager.FindUserByUsernameOrEmail(model.UsernameOrEmail);
+            if (!user.Found)
                 return NotFound();
             
             return Ok(new ForgotPasswordResponse
             {
-                Email = user.Email,
-                Token = await UserManager.GeneratePasswordResetTokenAsync(user)
+                Email = user.Value.Email,
+                Token = await UserManager.GeneratePasswordResetTokenAsync(user.Value)
             });                                                          
         }
 
@@ -109,11 +109,11 @@ namespace MatchBox.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await FindUserByUsernameOrEmail(model.Email);
-            if (user == null)
+            var user = await UserManager.FindUserByUsernameOrEmail(model.Email);
+            if (user.Found)
                 return NotFound();
 
-            var resetPassResult = await UserManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+            var resetPassResult = await UserManager.ResetPasswordAsync(user.Value, model.Token, model.NewPassword);
             if (resetPassResult.Succeeded)
                 return Ok();
             
@@ -135,20 +135,20 @@ namespace MatchBox.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await FindUserByUsernameOrEmail(model.Email);
-            if (user != null)
+            var user = await UserManager.FindUserByUsernameOrEmail(model.Email);
+            if (user.Found)
                 return Conflict(new { message = CredentialsAlreadyTaken });
 
-            user = Mapper.Map<DbUser>(model);
+            var newUser = Mapper.Map<DbUser>(model);
 
-            var createUserResult = await UserManager.CreateAsync(user, model.Password);
+            var createUserResult = await UserManager.CreateAsync(newUser, model.Password);
             if (createUserResult.Succeeded)
             {
                 return Ok(new LoginResponseModel
                 {
-                    UserName = user.UserName,
-                    Email = user.Email,
-                    Jwt = JwtProducer.Generate(user)
+                    UserName = newUser.UserName,
+                    Email = newUser.Email,
+                    Jwt = JwtProducer.Generate(newUser)
                 });
             }
 

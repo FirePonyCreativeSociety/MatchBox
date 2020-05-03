@@ -3,11 +3,16 @@ using MatchBox.API.Models;
 using MatchBox.Data;
 using MatchBox.Data.Models;
 using MatchBox.Internal;
+using MatchBox.Models;
 using MatchBox.Services.Email;
 using Microsoft.AspNetCore.Identity;
-using System;
+using Microsoft.AspNetCore.Mvc;
+using MatchBox.Internal;
 using System.Linq;
 using System.Threading.Tasks;
+using MatchBox.Data.Extensions;
+using Microsoft.AspNetCore.Http;
+using System;
 
 namespace MatchBox.Controllers
 {
@@ -18,30 +23,175 @@ namespace MatchBox.Controllers
         public UsersController(
             MatchBoxDbContext dbContext, 
             IMapper mapper, 
-            IJwtProducer jwtProducer, 
             UserManager<DbUser> userManager,
-            SignInManager<DbUser> signInManager,
             IEmailSender emailSender)
             : base(dbContext, mapper)
         {
-            JwtProducer = jwtProducer ?? throw new ArgumentNullException();
             UserManager = userManager;
-            SignInManager = signInManager;
             EmailSender = emailSender;
         }
 
-        public IJwtProducer JwtProducer { get; }
         public UserManager<DbUser> UserManager { get; }
-        public SignInManager<DbUser> SignInManager { get; }
         public IEmailSender EmailSender { get; }
-        public EmailConfiguration EmailConfiguration { get; }
 
         protected override IQueryable<DbUser> ControllerDbSet => DbContext.Users;
 
-        async Task<DbUser> FindUserByUsernameOrEmail(string usernameOrEmail)
+        async Task<ActionResult> LockUnlockUser(UsernameOrEmailModel model, bool isLocked)
         {
-            var user = await UserManager.FindByNameAsync(usernameOrEmail);
-            return user ?? await UserManager.FindByEmailAsync(usernameOrEmail);
-        }        
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userResp = await UserManager.FindUserByUsernameOrEmail(model.UsernameOrEmail);
+            if (!userResp.Found)
+                return NotFound();
+
+            var resp = await UserManager.SetLockoutEnabledAsync(userResp.Value, isLocked);
+            if (resp.Succeeded)
+            {
+                if (isLocked)
+                    await UserManager.SetLockoutEndDateAsync(userResp.Value, DateTimeOffset.Now.AddYears(100));
+                else
+                    await UserManager.SetLockoutEndDateAsync(userResp.Value, null);
+            }
+
+            if (resp.Succeeded)
+                return Ok();            
+
+            foreach (var error in resp.Errors)
+            {
+                ModelState.TryAddModelError(error.Code, error.Description);
+            }
+
+            return BadRequest(ModelState);
+        }
+
+        [HttpPost(nameof(UnlockUser))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public Task<ActionResult> UnlockUser([FromBody] UsernameOrEmailModel model)
+        {
+            return LockUnlockUser(model, false);
+        }
+
+        [HttpPost(nameof(LockUser))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public Task<ActionResult> LockUser([FromBody] UsernameOrEmailModel model)
+        {
+            return LockUnlockUser(model, true);
+        }
+
+        [HttpDelete()]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> Delete([FromBody] UsernameOrEmailModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userResp = await UserManager.FindUserByUsernameOrEmail(model.UsernameOrEmail);
+            if (!userResp.Found)
+                return NotFound();
+
+            var resp = await UserManager.DeleteAsync(userResp.Value);
+            if (resp.Succeeded)
+                return Ok();
+
+            foreach (var error in resp.Errors)
+            {
+                ModelState.TryAddModelError(error.Code, error.Description);
+            }
+
+            return BadRequest(ModelState);            
+        }
+
+        [HttpPatch()]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> Update([FromBody] UpdateUserModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userResp = await UserManager.FindUserByUsernameOrEmail(model.Username);
+            if (!userResp.Found)
+                return NotFound();
+
+            Mapper.Map(model, userResp.Value);
+
+            var resp = await UserManager.UpdateAsync(userResp.Value);
+            if (resp.Succeeded)
+                return Ok();
+
+            foreach (var error in resp.Errors)
+            {
+                ModelState.TryAddModelError(error.Code, error.Description);
+            }
+
+            return BadRequest(ModelState);
+        }
+
+        [HttpPost(nameof(AddClaimToUser))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> AddClaimToUser([FromBody] AddClaimToUserModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userResp = await UserManager.FindUserByUsernameOrEmail(model.UsernameOrEmail);
+            if (!userResp.Found)
+                return NotFound();
+
+            var identityClaim = new System.Security.Claims.Claim(model.Claim.ClaimType, model.Claim.ClaimValue);
+            var resp = await UserManager.AddClaimAsync(userResp.Value, identityClaim);
+
+            if (resp.Succeeded)
+                return Ok();
+
+            foreach (var error in resp.Errors)
+            {
+                ModelState.TryAddModelError(error.Code, error.Description);
+            }
+
+            return BadRequest(ModelState);
+        }
+
+
+        [HttpPost(nameof(RemoveClaimFromUser))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> RemoveClaimFromUser([FromBody] RemoveClaimFromUserModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userResp = await UserManager.FindUserByUsernameOrEmail(model.UsernameOrEmail);
+            if (!userResp.Found)
+                return NotFound();
+
+            var storedClaims = await UserManager.GetClaimsAsync(userResp.Value);
+            foreach (var claimToRemove in storedClaims.Where(c => c.Type.Equals(model.ClaimType, StringComparison.OrdinalIgnoreCase)))
+            {
+                var removeResp = await UserManager.RemoveClaimAsync(userResp.Value, claimToRemove);
+                if (!removeResp.Succeeded)
+                {
+                    foreach (var error in removeResp.Errors)
+                    {
+                        ModelState.TryAddModelError(error.Code, error.Description);
+                    }
+                }
+            }
+            if (ModelState.ErrorCount>0)
+                return BadRequest(ModelState);
+            else
+                return Ok();
+        }
     }
 }

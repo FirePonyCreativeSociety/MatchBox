@@ -36,9 +36,12 @@ namespace MatchBox.Internal
                 new Claim(ClaimTypes.DateOfBirth, user.DateOfBirth.ToString()),
             };
 
-            foreach (var claim in user.Claims)
+            if (user.Claims != null)
             {
-                claimsList.Add(new Claim(claim.ClaimType, claim.ClaimValue));
+                foreach (var claim in user.Claims)
+                {
+                    claimsList.Add(new Claim(claim.ClaimType, claim.ClaimValue));
+                }
             }
 
             var tokenDescriptor = new SecurityTokenDescriptor

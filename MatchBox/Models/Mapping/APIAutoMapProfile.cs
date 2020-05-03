@@ -22,6 +22,8 @@ namespace MatchBox.Models.Mapping
             // AuthenticationController
             CreateMap<DbUserClaim, Claim>().ReverseMap();
             CreateMap<DbUser, RegisterNewUserModel>().ReverseMap();
+            CreateMap<DbUser, UpdateUserModel>().ReverseMap();
+            CreateMap<System.Security.Claims.Claim, Claim>().ReverseMap();
         }
     }
 }
