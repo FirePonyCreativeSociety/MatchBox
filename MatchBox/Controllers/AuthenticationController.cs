@@ -19,8 +19,9 @@ namespace MatchBox.Controllers
     [AllowAnonymous]
     public class AuthenticationController : RESTControllerBase<User, DbUser>
     {
-        private const string BadLoginMessage = "Username or password is incorrect";
-        private const string UserLockedOutMessage = "User is locked out.";
+        const string BadLoginMessage = "Username or password is incorrect";
+        const string UserLockedOutMessage = "User is locked out.";
+        const string CredentialsAlreadyTaken  = "The user name or email is already taken.";
 
         public AuthenticationController(MatchBoxDbContext dbContext, IMapper mapper, IJwtProducer jwtProducer,
             UserManager<DbUser> userManager,
@@ -136,7 +137,7 @@ namespace MatchBox.Controllers
 
             var user = await FindUserByUsernameOrEmail(model.Email);
             if (user != null)
-                return Conflict(new { message = "The user name or email is already taken." });
+                return Conflict(new { message = CredentialsAlreadyTaken });
 
             user = Mapper.Map<DbUser>(model);
 
