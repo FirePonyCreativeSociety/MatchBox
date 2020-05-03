@@ -31,9 +31,8 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
-        "ConnectionStrings:MatchBox": "c:\\MatchBox2.db",
-        "MatchBoxSettings:Jwt:IssuerSigningKey": "bubba roicks!",
-        "MatchBoxSettings:User:MaxFailedAccessAttempts": "3"
+        "MatchBox:Jwt:IssuerSigningKey": "bubba roicks!",
+        "MatchBox:User:MaxFailedAccessAttempts": "3"
       },
       "publishAllPorts": true,
       "useSSL": true
