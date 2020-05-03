@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using MatchBox.Data.Extensions;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections.Generic;
 
 namespace MatchBox.Controllers
 {
@@ -192,6 +193,13 @@ namespace MatchBox.Controllers
                 return BadRequest(ModelState);
             else
                 return Ok();
+        }
+
+        [HttpGet(nameof(Get))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public Task<ActionResult<IEnumerable<User>>> Get(QueryModel model)
+        {            
+            return base.GetAll(model);
         }
     }
 }

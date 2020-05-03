@@ -1,4 +1,5 @@
-﻿using MatchBox.Models.Interfaces;
+﻿using MatchBox.Models;
+using MatchBox.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -26,7 +27,7 @@ namespace MatchBox.API.Models
         [Required]
         public string LastName { get; set; }
 
-        //public ICollection<CustomClaim> CustomClaims { get; set; } = new Collection<CustomClaim>();
+        public ICollection<Claim> Claims { get; set; } = new Collection<Claim>();
         public ICollection<UserGroup> UserGroups { get; set; } = new Collection<UserGroup>();
 
         int IIntId.GetId() => this.UserId;

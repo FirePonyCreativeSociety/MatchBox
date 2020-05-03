@@ -2,7 +2,12 @@
 using MatchBox.API.Models;
 using MatchBox.Data;
 using MatchBox.Data.Models;
+using MatchBox.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MatchBox.Controllers
 {
@@ -15,5 +20,12 @@ namespace MatchBox.Controllers
         }
 
         protected override IQueryable<DbGroup> ControllerDbSet => DbContext.Groups;
+
+        [HttpGet(nameof(Get))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public Task<ActionResult<IEnumerable<Group>>> Get(QueryModel model)
+        {
+            return base.GetAll(model);
+        }
     }
 }

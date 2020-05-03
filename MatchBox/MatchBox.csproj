@@ -8,7 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\EventsController.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="MatchBox.db" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Controllers\EventsController.cs" />
   </ItemGroup>
 
   <ItemGroup>
