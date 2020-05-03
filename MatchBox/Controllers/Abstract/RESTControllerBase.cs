@@ -36,8 +36,8 @@ namespace MatchBox.Controllers
             return await DbContext.FindAsync(typeof(APIMODEL), id) as APIMODEL;            
         }
 
-        [HttpPost()]
-        public async Task<ActionResult<APIMODEL>> Create(APIMODEL value)
+       // [HttpPost()]
+        protected async Task<ActionResult<APIMODEL>> Create(APIMODEL value)
         {
             var dbValue = Mapper.Map<DBMODEL>(value);
             DbContext.Add(dbValue);
@@ -47,8 +47,8 @@ namespace MatchBox.Controllers
             return CreatedAtAction(nameof(GetById), new { id = value.GetId() }, value);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<APIMODEL>> Delete(int id)
+        //[HttpDelete("{id}")]
+        protected async Task<ActionResult<APIMODEL>> Delete(int id)
         {
             var tmp = await FindById(id);
 
@@ -61,8 +61,8 @@ namespace MatchBox.Controllers
             return tmp;
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<APIMODEL>> GetById(int id)
+        //[HttpGet("{id}")]
+        protected async Task<ActionResult<APIMODEL>> GetById(int id)
         {
             var tmp = await FindById(id);
 
@@ -72,8 +72,8 @@ namespace MatchBox.Controllers
                 return NotFound();
         }
 
-        [HttpGet()]
-        public async Task<ActionResult<IEnumerable<APIMODEL>>> GetAll(QueryModel model)
+        //[HttpGet()]
+        protected async Task<ActionResult<IEnumerable<APIMODEL>>> GetAll(QueryModel model)
         {
             // https://github.com/StefH/System.Linq.Dynamic.Core/wiki/Dynamic-Expressions
             IQueryable<DBMODEL> dbSet = ControllerDbSet;

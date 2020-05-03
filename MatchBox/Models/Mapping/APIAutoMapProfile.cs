@@ -18,6 +18,10 @@ namespace MatchBox.Models.Mapping
             CreateMap<UserGroup, DbUserGroup>().ReverseMap();
 
             CreateMap<Event, DbEvent>().ReverseMap();
+
+            // AuthenticationController
+            CreateMap<DbUserClaim, Claim>().ReverseMap();
+            CreateMap<DbUser, RegisterNewUserModel>().ReverseMap();
         }
     }
 }

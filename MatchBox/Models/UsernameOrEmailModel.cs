@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -8,7 +9,7 @@ namespace MatchBox.Models
 {
     public class UsernameOrEmailModel
     {
-        [Required]
+        [Required]        
         public string UsernameOrEmail { get; set; }        
     }
 }

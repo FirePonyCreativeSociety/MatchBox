@@ -44,7 +44,7 @@ namespace MatchBox.Tests
 
             // Adds all controllers from main assembly. By default, the controllers are not loaded so this is necessary.
             // AddControllers() and AddApplicationPart().AddControllers() did not work.
-            var controllers = typeof(UsersController).Assembly.ExportedTypes.Where(x => !x.IsAbstract && typeof(ControllerBase).IsAssignableFrom(x)).ToList();
+            var controllers = typeof(AuthenticationController).Assembly.ExportedTypes.Where(x => !x.IsAbstract && typeof(ControllerBase).IsAssignableFrom(x)).ToList();
             controllers.ForEach(c => services.AddTransient(c));
 
             // Executes the same ConfigureServices() as the MatchBox application

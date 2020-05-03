@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Routing;
 
 namespace MatchBox.Tests
 {
-    public class UsersControllerTests : IntegrationTestBase<UsersController>
+    public class UsersControllerTests : IntegrationTestBase<AuthenticationController>
     {
         public UsersControllerTests(IocFixture dbFixture)
             : base(dbFixture)
@@ -34,8 +34,8 @@ namespace MatchBox.Tests
                     UsernameOrEmail = MatchBoxDbContext.AdminUserName,
                     Password = MatchBoxDbInitializer.DefaultPassword
                 });
-
-                var okResult = result as OkObjectResult;
+                
+                var okResult = result.Result as OkObjectResult;
                 Assert.NotNull(okResult);
             }
         }
