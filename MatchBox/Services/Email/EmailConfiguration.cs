@@ -7,11 +7,11 @@ namespace MatchBox.Services.Email
 {
     public class EmailConfiguration
     {
-        public string From { get; set; } 
-        public string SmtpServer { get; set; }
-        public int Port { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
+        public string From { get; set; } = "donotreply@devtests.local";
+        public string SmtpServer { get; set; } = "localhost";
+        public int Port { get; set; } = 25;
+        public string UserName { get; set; } = "adminuser@devtests.local";
+        public string Password { get; set; } = "password";
         public bool UseSSL { get; set; } = true;
     }
 }

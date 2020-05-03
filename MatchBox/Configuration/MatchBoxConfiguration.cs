@@ -10,7 +10,7 @@ namespace MatchBox.Configuration
     {
         public const string AppSettingsSectionName = "MatchBox";
 
-        public JwtConfiguration Jwt { get; set; } = new JwtConfiguration();
+        public SecurityConfiguration Security { get; set; } = new SecurityConfiguration();
 
         public UserConfiguration User { get; set; } = new UserConfiguration();            
 

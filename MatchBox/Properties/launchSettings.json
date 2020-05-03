@@ -31,7 +31,9 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
-        "MatchBox:Jwt:IssuerSigningKey": "bubba roicks!",
+        "MatchBox:Security:CorsOrigins:0": "origin1",
+        "MatchBox:Security:JwtIssuerSigningKey": "bubba roicks!",
+        "MatchBox:Security:CorsOrigins:1": "origin2",
         "MatchBox:User:MaxFailedAccessAttempts": "3"
       },
       "publishAllPorts": true,

@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Linq;
 using System.Text;
 
 namespace MatchBox
@@ -28,6 +29,7 @@ namespace MatchBox
 
         public IConfiguration Configuration { get; }
 
+        const string CORSPolicyName = "MatchBoxCORS";
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -37,16 +39,16 @@ namespace MatchBox
             var mbCfg = appSettingsSection.Get<MatchBoxConfiguration>();
             services.AddSingleton<MatchBoxConfiguration>(mbCfg);
             services.AddSingleton<EmailConfiguration>(mbCfg.Email);
-            services.AddSingleton<JwtConfiguration>(mbCfg.Jwt);
+            services.AddSingleton<SecurityConfiguration>(mbCfg.Security);
             services.AddSingleton<PasswordConfiguration>(mbCfg.Password);
             services.AddSingleton<UserConfiguration>(mbCfg.User);
 
             // Configure jwt authentication            
             // TODO: this is not the ideal place to check... or is it?
-            if (string.IsNullOrWhiteSpace(mbCfg.Jwt.IssuerSigningKey))
+            if (string.IsNullOrWhiteSpace(mbCfg.Security.JwtIssuerSigningKey))
                 throw new Exception($"Unspecified Jwt IssuerSigningKey value in configuration.");
                         
-            var key = Encoding.ASCII.GetBytes(mbCfg.Jwt.IssuerSigningKey);
+            var key = Encoding.ASCII.GetBytes(mbCfg.Security.JwtIssuerSigningKey);
             services.AddAuthentication(x =>
             {
                 x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -62,10 +64,21 @@ namespace MatchBox
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
-                    ValidateAudience = false,                    
+                    ValidateAudience = false,
                 };
             });
-            
+
+            if ((mbCfg.Security?.CorsOrigins != null) && mbCfg.Security.CorsOrigins.Any())
+            {
+                services.AddCors(options =>
+                {
+                    options.AddDefaultPolicy(builder =>
+                    {
+                        builder.WithOrigins(mbCfg.Security.CorsOrigins);
+                    });
+                });
+            }
+
             // Auto mapper
             services.AddAutoMapper(typeof(APIAutoMapProfile));
 
@@ -119,7 +132,9 @@ namespace MatchBox
             });
 
             services.AddTransient<IJwtProducer, JwtProducer>();
-            services.AddTransient<IEmailSender, EmailSender>();            
+            services.AddTransient<IEmailSender, EmailSender>();
+
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -140,6 +155,7 @@ namespace MatchBox
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseCors();
             
             app.UseAuthorization();
             app.UseAuthentication();

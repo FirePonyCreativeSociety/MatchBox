@@ -25,7 +25,7 @@ namespace MatchBox.Internal
         public string Generate(DbUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(Configuration.Jwt.IssuerSigningKey);
+            var key = Encoding.ASCII.GetBytes(Configuration.Security.JwtIssuerSigningKey);
 
             var claimsList = new List<Claim>()
             {
