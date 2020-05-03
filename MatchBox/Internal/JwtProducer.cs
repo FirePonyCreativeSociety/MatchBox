@@ -26,17 +26,24 @@ namespace MatchBox.Internal
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Configuration.Jwt.IssuerSigningKey);
+
+            var claimsList = new List<Claim>()
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.GivenName, user.FirstName),
+                new Claim(ClaimTypes.Surname, user.LastName),
+                new Claim(ClaimTypes.DateOfBirth, user.DateOfBirth.ToString()),
+            };
+
+            foreach (var claim in user.Claims)
+            {
+                claimsList.Add(new Claim(claim.ClaimType, claim.ClaimValue));
+            }
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {                    
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.GivenName, user.FirstName),
-                    new Claim(ClaimTypes.Surname, user.LastName),      
-                    new Claim(ClaimTypes.DateOfBirth, user.DateOfBirth.ToString()),
-
-                }),
+                Subject = new ClaimsIdentity(claimsList),
                 Issuer = "MatchBox",
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
