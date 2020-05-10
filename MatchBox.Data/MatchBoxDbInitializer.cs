@@ -94,7 +94,7 @@ namespace MatchBox.Data
             if (!result.Succeeded)
                 throw new System.Exception($"Could not create the default user '{userName}'.");
 
-            groups = groups ?? new string[0];
+            groups ??= Array.Empty<string>(); // Compound assignment! Pretty RAD
             if (groups.Any())
             {
                 newUser.UserGroups = new Collection<DbUserGroup>();

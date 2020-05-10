@@ -27,7 +27,9 @@ namespace MatchBox.Tests
         {
             var ctrl = CreateController();
 
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
             foreach (var name in MatchBoxDbInitializer.GetDefaultUserNames())
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
             {
                 var result = await ctrl.Login(new LoginModel
                 {
@@ -49,9 +51,9 @@ namespace MatchBox.Tests
                 
             };
             ctrl.Url = new UrlHelper(ac);
-            var forgotResp = await ctrl.ForgotPassword(new UsernameOrEmailModel
-            { 
-                UsernameOrEmail = "alef",                
+            _ = await ctrl.ForgotPassword(new UsernameOrEmailModel
+            {
+                UsernameOrEmail = "alef",
             });
 
             //await ctrl.ResetPassword(new ResetPasswordModel

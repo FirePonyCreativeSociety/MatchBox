@@ -9,7 +9,7 @@ using System;
 
 namespace MatchBox
 {
-    public class Program
+    public static class Program
     {
         public static int Main(string[] args)
         {
@@ -30,12 +30,14 @@ namespace MatchBox
                 
                 return 0;
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception err)
             {
                 Console.WriteLine($"MatchBox terminated NOT OK: {err.Message}");
 
                 return 1;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

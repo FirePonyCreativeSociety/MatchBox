@@ -10,7 +10,7 @@ namespace MatchBox.Internal
 {
     public abstract class JwtProducerBase : IJwtProducer
     {
-        public JwtProducerBase(IOptions<MatchBoxConfiguration> settings)
+        protected JwtProducerBase(IOptions<MatchBoxConfiguration> settings)
            : base()
         {
             Configuration = settings.Value ?? throw new ArgumentNullException(nameof(settings));

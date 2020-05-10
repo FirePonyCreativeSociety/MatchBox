@@ -32,7 +32,7 @@ namespace MatchBox.Controllers
             { 
                 PasswordSettings = Configuration.Password,
                 UserSettings = Configuration.User,
-                CorsOrigins = Configuration.Security?.CorsOrigins
+                Configuration.Security?.CorsOrigins // This uses the default name CorsOrigin
             };
 
             return Ok(tmp);

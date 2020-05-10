@@ -22,6 +22,8 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
+        "MatchBox:Security__CorsOrigins__1": "cors2!",
+        "MatchBox:Security__CorsOrigins__0": "cors1",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
