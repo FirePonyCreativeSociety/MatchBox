@@ -67,16 +67,28 @@ namespace MatchBox
                 };                
             });
 
-            if ((mbCfg.Security?.CorsOrigins != null) && mbCfg.Security.CorsOrigins.Any())
+            services.AddCors(options =>
             {
-                services.AddCors(options =>
+                options.AddDefaultPolicy(builder =>
                 {
-                    options.AddDefaultPolicy(builder =>
+                    // If CORS options are null or empty, we go AnyOrigin, otherwise just the specified ones
+                    bool corsWasSetup = (mbCfg.Security?.CorsOrigins != null) && (mbCfg.Security.CorsOrigins.Any());
+                    if (corsWasSetup)
                     {
-                        builder.WithOrigins(mbCfg.Security.CorsOrigins.ToArray());
-                    });
+                        builder = builder.WithOrigins(mbCfg.Security.CorsOrigins.ToArray());
+                    }
+                    else
+                    {
+                        builder = builder.AllowAnyOrigin();
+                    }
+
+                    // Finishes
+                    builder.AllowAnyMethod()
+                           .AllowAnyHeader();
+                           //.SetIsOriginAllowed(hostName => true)
+                           //.AllowCredentials(); // This is to avoid this https://stackoverflow.com/questions/53675850/how-to-fix-the-cors-protocol-does-not-allow-specifying-a-wildcard-any-origin
                 });
-            }
+            });            
 
             // Auto mapper
             services.AddAutoMapper(typeof(APIAutoMapProfile));

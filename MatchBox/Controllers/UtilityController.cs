@@ -28,11 +28,15 @@ namespace MatchBox.Controllers
         [HttpGet()]
         public IActionResult Get()
         {
+            var keyLength = Configuration?.Security?.JwtIssuerSigningKey?.Length ?? 0;
+            
             var tmp = new 
             { 
                 PasswordSettings = Configuration.Password,
                 UserSettings = Configuration.User,
-                Configuration.Security?.CorsOrigins // This uses the default name CorsOrigin
+                Configuration.Security?.CorsOrigins,
+                // This uses the default name CorsOrigin
+                JwtIssuerSigningKeyLength = keyLength,
             };
 
             return Ok(tmp);

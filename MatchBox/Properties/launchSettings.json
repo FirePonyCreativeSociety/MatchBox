@@ -30,13 +30,9 @@
     },
     "Docker": {
       "commandName": "Docker",
-      "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api/Utility",
       "environmentVariables": {
-        "MatchBox:Security:CorsOrigins:0": "origin1_uno!!",
-        "MatchBox:Security:JwtIssuerSigningKey": "bubba roicks!",
-        "MatchBox:Security:CorsOrigins:1": "origin2_due",
-        "MatchBox:User:MaxFailedAccessAttempts": "3"
+        "MatchBox__User_MaxFailedAccessAttempts": "3"
       },
       "publishAllPorts": true,
       "useSSL": true
