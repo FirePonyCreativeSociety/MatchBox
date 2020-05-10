@@ -11,18 +11,31 @@ namespace MatchBox
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
+            Console.WriteLine("Starting MatchBox!");
+            try
+            {
+                var host = CreateHostBuilder(args).Build();
 
-            using (var scope = host.Services.CreateScope())
-            {                
-                new MatchBoxDbInitializer(scope.ServiceProvider)
-                    .Initialize()
-                    .Wait();                
+                using (var scope = host.Services.CreateScope())
+                {
+                    new MatchBoxDbInitializer(scope.ServiceProvider)
+                        .Initialize()
+                        .Wait();
+                }
+
+                host.Run();
+                Console.WriteLine("MatchBox terminated OK.");
+                
+                return 0;
             }
+            catch (Exception err)
+            {
+                Console.WriteLine($"MatchBox terminated NOT OK: {err.Message}");
 
-            host.Run();
+                return 1;
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

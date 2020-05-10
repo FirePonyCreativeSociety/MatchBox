@@ -31,7 +31,8 @@ namespace MatchBox.Controllers
             var tmp = new 
             { 
                 PasswordSettings = Configuration.Password,
-                UserSettings = Configuration.User
+                UserSettings = Configuration.User,
+                CorsOrigins = Configuration.Security?.CorsOrigins
             };
 
             return Ok(tmp);

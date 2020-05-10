@@ -29,7 +29,6 @@ namespace MatchBox
 
         public IConfiguration Configuration { get; }
 
-        const string CORSPolicyName = "MatchBoxCORS";
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -47,7 +46,7 @@ namespace MatchBox
             // TODO: this is not the ideal place to check... or is it?
             if (string.IsNullOrWhiteSpace(mbCfg.Security.JwtIssuerSigningKey))
                 throw new Exception($"Unspecified Jwt IssuerSigningKey value in configuration.");
-                        
+            
             var key = Encoding.ASCII.GetBytes(mbCfg.Security.JwtIssuerSigningKey);
             services.AddAuthentication(x =>
             {
@@ -58,14 +57,14 @@ namespace MatchBox
             .AddJwtBearer(x =>
             {
                 x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
+                x.SaveToken = true;                
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                };
+                };                
             });
 
             if ((mbCfg.Security?.CorsOrigins != null) && mbCfg.Security.CorsOrigins.Any())

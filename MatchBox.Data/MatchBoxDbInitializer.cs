@@ -31,7 +31,10 @@ namespace MatchBox.Data
 
         public async Task Initialize() 
         {
-            Context.Database.EnsureCreated();
+            //if (Context.Database.EnsureCreated())
+            //{
+                await Context.Database.MigrateAsync();
+            //}
 
             // If no users are present we create all the default entities
             if (await Context.Users.AnyAsync())

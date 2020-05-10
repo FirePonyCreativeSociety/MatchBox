@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MatchBox.Data.Migrations
 {
-    public partial class Initial : Migration
+    public partial class NewInitialWithAvatar : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,9 +12,10 @@ namespace MatchBox.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Sqlite:Autoincrement", true),
                     CreatedOn = table.Column<DateTime>(nullable: false),
-                    Title = table.Column<string>(nullable: false)
+                    Title = table.Column<string>(nullable: false),
+                    Data = table.Column<byte[]>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -26,7 +27,7 @@ namespace MatchBox.Data.Migrations
                 columns: table => new
                 {
                     GroupId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Sqlite:Autoincrement", true),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     Name = table.Column<string>(nullable: false),
                     Type = table.Column<string>(nullable: true),
@@ -42,7 +43,7 @@ namespace MatchBox.Data.Migrations
                 columns: table => new
                 {
                     RoleId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(nullable: true),
@@ -58,7 +59,7 @@ namespace MatchBox.Data.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Sqlite:Autoincrement", true),
                     UserName = table.Column<string>(maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(maxLength: 256, nullable: true),
                     Email = table.Column<string>(maxLength: 256, nullable: true),
@@ -77,7 +78,8 @@ namespace MatchBox.Data.Migrations
                     DateOfBirth = table.Column<DateTime>(nullable: false),
                     FirstName = table.Column<string>(nullable: false),
                     MiddleName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: false)
+                    LastName = table.Column<string>(nullable: false),
+                    Avatar = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -89,7 +91,7 @@ namespace MatchBox.Data.Migrations
                 columns: table => new
                 {
                     RoleClaimId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Sqlite:Autoincrement", true),
                     RoleId = table.Column<int>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true)
@@ -110,7 +112,7 @@ namespace MatchBox.Data.Migrations
                 columns: table => new
                 {
                     UserClaimId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Sqlite:Autoincrement", true),
                     UserId = table.Column<int>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true)
@@ -229,8 +231,7 @@ namespace MatchBox.Data.Migrations
                 name: "RoleNameIndex",
                 table: "Roles",
                 column: "NormalizedName",
-                unique: true,
-                filter: "[NormalizedName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserClaims_UserId",
@@ -261,8 +262,7 @@ namespace MatchBox.Data.Migrations
                 name: "UserNameIndex",
                 table: "Users",
                 column: "NormalizedUserName",
-                unique: true,
-                filter: "[NormalizedUserName] IS NOT NULL");
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

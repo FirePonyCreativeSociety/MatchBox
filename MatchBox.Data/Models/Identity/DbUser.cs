@@ -21,6 +21,8 @@ namespace MatchBox.Data.Models
         [Required]
         public string LastName { get; set; }
 
+        public string Avatar { get; set; }
+
         public virtual ICollection<DbUserClaim> Claims { get; set; }
         public virtual ICollection<DbUserLogin> Logins { get; set; }
         public virtual ICollection<DbUserToken> Tokens { get; set; }

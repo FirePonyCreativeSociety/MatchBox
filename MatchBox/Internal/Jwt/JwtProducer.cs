@@ -12,17 +12,14 @@ using System.Threading.Tasks;
 
 namespace MatchBox.Internal
 {
-    public class JwtProducer : IJwtProducer
+    public class JwtProducer : JwtProducerBase
     {
         public JwtProducer(IOptions<MatchBoxConfiguration> settings)
-            : base()
+            : base(settings)
         {
-            Configuration = settings.Value;
         }
 
-        public MatchBoxConfiguration Configuration { get; }
-
-        public string Generate(DbUser user)
+        public override string Generate(DbUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Configuration.Security.JwtIssuerSigningKey);
@@ -47,7 +44,8 @@ namespace MatchBox.Internal
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claimsList),
-                Issuer = "MatchBox",
+                Audience = Configuration.Security.Audience,
+                Issuer =  Configuration.Security.Issuer,
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
