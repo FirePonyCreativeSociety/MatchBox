@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Linq;
 using System.Text;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace MatchBox
 {
@@ -99,11 +100,15 @@ namespace MatchBox
                 var connStr = Configuration.GetConnectionString(MatchBoxDbContext.DbConnectionName);
 
                 // TODO: temporary. This check me pick an RDBMS type
-                if (connStr.Contains("server", System.StringComparison.OrdinalIgnoreCase) && (connStr.Contains("database", System.StringComparison.OrdinalIgnoreCase) || connStr.Contains("initial catalog", System.StringComparison.OrdinalIgnoreCase)))
-                    opt.UseSqlServer(connStr);                
+                if (connStr.Contains("Filename", System.StringComparison.OrdinalIgnoreCase))
+                    opt.UseSqlite(connStr);
                 else
-                    opt.UseSqlite(connStr); 
+                    opt.UseSqlServer(connStr);
             });
+
+            // Key storage!
+            services.AddDataProtection()
+                    .PersistKeysToDbContext<MatchBoxDbContext>();
 
             services.AddIdentity<DbUser, DbRole>(options =>
                     {
@@ -129,7 +134,7 @@ namespace MatchBox
 
             services.AddSwaggerGen(c => 
             {
-                c.SwaggerDoc(name: "v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "MatchBox API", Version = "v1" });
+                c.SwaggerDoc(name: Version.FullVersion, new Microsoft.OpenApi.Models.OpenApiInfo { Title = "MatchBox API", Version = Version.FullVersion });
 
                 c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new Microsoft.OpenApi.Models.OpenApiSecurityScheme
                 {
@@ -153,16 +158,16 @@ namespace MatchBox
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 #pragma warning restore CA1822 // Mark members as static
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            //if (env.IsDevelopment())
+            //{
+            //    app.UseDeveloperExceptionPage(); 
+            //}
 
             //app.UseHttpsRedirection();
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "MatchBox API v1");
+                c.SwaggerEndpoint(url: $"/swagger/{Version.FullVersion}/swagger.json", name: $"MatchBox API {Version.FullVersion}");
             });
 
             app.UseStaticFiles();

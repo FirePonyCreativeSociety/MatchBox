@@ -14,6 +14,7 @@ using MatchBox.Data.Extensions;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace MatchBox.Controllers
 {
@@ -25,8 +26,9 @@ namespace MatchBox.Controllers
             MatchBoxDbContext dbContext, 
             IMapper mapper, 
             UserManager<DbUser> userManager,
-            IEmailSender emailSender)
-            : base(dbContext, mapper)
+            IEmailSender emailSender,
+            IDataProtectionProvider dataProtectionProvider)
+            : base(dbContext, mapper, dataProtectionProvider)
         {
             UserManager = userManager;
             EmailSender = emailSender;
@@ -37,10 +39,15 @@ namespace MatchBox.Controllers
 
         protected override IQueryable<DbUser> ControllerDbSet => DbContext.Users;
 
-        async Task<ActionResult> LockUnlockUser(UsernameOrEmailModel model, bool isLocked)
+        async Task<ActionResult<EmptyResult>> LockUnlockUser(UsernameOrEmailModel model, bool isLocked)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            if (!EnsureIsAdmin<EmptyResult>(out var mandatoryResponse))
+            {
+                return mandatoryResponse;
+            }
 
             var userResp = await UserManager.FindUserByUsernameOrEmail(model.UsernameOrEmail);
             if (!userResp.Found)
@@ -70,7 +77,7 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public Task<ActionResult> UnlockUser([FromBody] UsernameOrEmailModel model)
+        public Task<ActionResult<EmptyResult>> UnlockUser([FromBody] UsernameOrEmailModel model)
         {
             return LockUnlockUser(model, false);
         }
@@ -79,7 +86,7 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public Task<ActionResult> LockUser([FromBody] UsernameOrEmailModel model)
+        public Task<ActionResult<EmptyResult>> LockUser([FromBody] UsernameOrEmailModel model)
         {
             return LockUnlockUser(model, true);
         }
@@ -88,7 +95,7 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> Delete([FromBody] UsernameOrEmailModel model)
+        public async Task<ActionResult<EmptyResult>> Delete([FromBody] UsernameOrEmailModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -113,7 +120,7 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> Update([FromBody] UpdateUserModel model)
+        public async Task<ActionResult<EmptyResult>> Update([FromBody] UpdateUserModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -140,7 +147,7 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> AddClaimToUser([FromBody] AddClaimToUserModel model)
+        public async Task<ActionResult<EmptyResult>> AddClaimToUser([FromBody] AddClaimToUserModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -168,7 +175,7 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> RemoveClaimFromUser([FromBody] RemoveClaimFromUserModel model)
+        public async Task<ActionResult<EmptyResult>> RemoveClaimFromUser([FromBody] RemoveClaimFromUserModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

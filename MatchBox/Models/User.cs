@@ -27,6 +27,8 @@ namespace MatchBox.API.Models
         [Required]
         public string LastName { get; set; }
 
+        public string Avatar { get; set; }
+
         public ICollection<Claim> Claims { get; set; } = new Collection<Claim>();
         public ICollection<UserGroup> UserGroups { get; set; } = new Collection<UserGroup>();
 

@@ -3,6 +3,7 @@ using MatchBox.API.Models;
 using MatchBox.Data;
 using MatchBox.Models;
 using MatchBox.Models.Interfaces;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -19,8 +20,8 @@ namespace MatchBox.Controllers
         where APIMODEL : class, IIntId, new()
         where DBMODEL : class, new()
     {
-        public RESTControllerBase(MatchBoxDbContext dbContext, IMapper mapper)
-            : base()
+        public RESTControllerBase(MatchBoxDbContext dbContext, IMapper mapper, IDataProtectionProvider dataProtectionProvider)
+            : base(dataProtectionProvider)
         {
             DbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));

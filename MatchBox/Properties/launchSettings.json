@@ -19,14 +19,12 @@
     },
     "MatchBox": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "MatchBox:Security__CorsOrigins__1": "cors2!",
-        "MatchBox:Security__CorsOrigins__0": "cors1",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+      "applicationUrl": "https://localhost:443;http://localhost:80"
     },
     "Docker": {
       "commandName": "Docker",
@@ -35,7 +33,8 @@
         "MatchBox__User_MaxFailedAccessAttempts": "3"
       },
       "publishAllPorts": true,
-      "useSSL": true
+      "useSSL": true,
+      "applicationUrl": "https://localhost:443;http://localhost:80"
     }
   }
 }

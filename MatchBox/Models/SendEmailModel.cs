@@ -15,5 +15,7 @@ namespace MatchBox.API.Models
         public string Subject { get; set; }
         
         public string Content { get; set; }
+        [Required]
+        public string AccessLevels { get; set; }
     }
 }

@@ -25,16 +25,17 @@ namespace MatchBox.Services.Email
         }
         
         public async Task SendEmailAsync(Message message)
-        {
-            using (var client = new SmtpClient())
+        {            
+            using (var client = new SmtpClient(new MailKit.ProtocolLogger("smtp.log")))
             {
                 try
                 {
                     await client.ConnectAsync(Configuration.SmtpServer, Configuration.Port, Configuration.UseSSL);
-                    //client.AuthenticationMechanisms.Remove("XOAUTH2");
+                    client.AuthenticationMechanisms.Remove("XOAUTH2");
                     await client.AuthenticateAsync(Configuration.UserName, Configuration.Password);
 
-                    await client.SendAsync(CreateEmailMessage(message));
+                    var msg = CreateEmailMessage(message);
+                    await client.SendAsync(msg);
                 }
                 catch
                 {

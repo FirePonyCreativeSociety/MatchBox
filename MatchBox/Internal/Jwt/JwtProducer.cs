@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -30,8 +31,10 @@ namespace MatchBox.Internal
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.GivenName, user.FirstName),
                 new Claim(ClaimTypes.Surname, user.LastName),
-                new Claim(ClaimTypes.DateOfBirth, user.DateOfBirth.ToString()),
-            };
+                new Claim(ClaimTypes.DateOfBirth, user.DateOfBirth.ToString(CultureInfo.InvariantCulture)),
+                new Claim("age", (DateTime.Now.Year - user.DateOfBirth.Year).ToString()),
+                new Claim("isAdult", ((DateTime.Now.Year - user.DateOfBirth.Year) >= 18).ToString()),
+            };            
 
             if (user.Claims != null)
             {

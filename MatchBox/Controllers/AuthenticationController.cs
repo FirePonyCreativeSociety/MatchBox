@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using MatchBox.API.Models;
 using MatchBox.Data;
 using MatchBox.Data.Models;
@@ -10,9 +6,13 @@ using MatchBox.Internal;
 using MatchBox.Models;
 using MatchBox.Services.Email;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MatchBox.Controllers
 {
@@ -23,32 +23,32 @@ namespace MatchBox.Controllers
         const string UserLockedOutMessage = "User is locked out.";
         const string CredentialsAlreadyTaken  = "The user name or email is already taken.";
 
-        public AuthenticationController(MatchBoxDbContext dbContext, IMapper mapper, IJwtProducer jwtProducer,
+        public AuthenticationController(
+            MatchBoxDbContext dbContext, 
+            IMapper mapper, 
+            IJwtProducer jwtProducer,
+            IDataProtectionProvider provider, 
             UserManager<DbUser> userManager,
             SignInManager<DbUser> signInManager,
             IEmailSender emailSender)
-            : base(dbContext, mapper)
+            : base(dbContext, mapper, provider)
         {
             JwtProducer = jwtProducer ?? throw new ArgumentNullException();
             UserManager = userManager;
             SignInManager = signInManager;
-            EmailSender = emailSender;
+            EmailSender = emailSender;            
         }
 
         public IJwtProducer JwtProducer { get; }
         public UserManager<DbUser> UserManager { get; }
         public SignInManager<DbUser> SignInManager { get; }
         public IEmailSender EmailSender { get; }
+        public IDataProtectionProvider Provider { get; }
+
         public EmailConfiguration EmailConfiguration { get; }
 
         protected override IQueryable<DbUser> ControllerDbSet => DbContext.Users;
-
-        //async Task<DbUser> FindUserByUsernameOrEmail(string usernameOrEmail)
-        //{
-        //    var user = await UserManager.FindByNameAsync(usernameOrEmail);
-        //    return user ?? await UserManager.FindByEmailAsync(usernameOrEmail);
-        //}
-
+        
         [HttpPost(nameof(Login))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -89,14 +89,12 @@ namespace MatchBox.Controllers
                 return BadRequest(ModelState);
 
             // https://code-maze.com/password-reset-aspnet-core-identity/        
-            var user = await UserManager.FindUserByUsernameOrEmail(model.UsernameOrEmail);
-            if (!user.Found)
-                return NotFound();
+            var candidateUser = await UserManager.FindUserByUsernameOrEmail(model.UsernameOrEmail);
             
             return Ok(new ForgotPasswordResponse
             {
-                Email = user.Value.Email,
-                Token = await UserManager.GeneratePasswordResetTokenAsync(user.Value)
+                Email = candidateUser.Value.Email,
+                Token = await UserManager.GeneratePasswordResetTokenAsync(candidateUser.Value)
             });                                                          
         }
 
@@ -104,7 +102,7 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordModel model)
+        public async Task<ActionResult<EmptyModel>> ResetPassword([FromBody] ResetPasswordModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -130,6 +128,7 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<LoginResponseModel>> RegisterNewUser([FromBody] RegisterNewUserModel model)
         {
             if (!ModelState.IsValid)
@@ -140,6 +139,20 @@ namespace MatchBox.Controllers
                 return Conflict(new { message = CredentialsAlreadyTaken });
 
             var newUser = Mapper.Map<DbUser>(model);
+
+            // Greatly inspired by https://code-maze.com/data-protection-aspnet-core/
+
+            var tmpKey = "ZpeSOwV53XNn/HBsoWDRwiKk8LBususgRpT1y/OPT8Aq3+rPLTOJ7/Q6bl0QkyhPoOd2L8+daHo+pNhcUBhiOg==";
+            var testEncryptedUsingKey_permissionKey1 = AdminProtector.Protect($"ADMIN");
+            var testEncryptedUsingKey_permissionKey2 = AdminProtector.Protect($"ADMIXN");
+            var testEncryptedUsingKey_permissionKey3 = AdminProtector.Protect($"{AccessLevel_Admin}");
+
+            if ((newUser.Claims!= null) && newUser.Claims.Any())
+            {
+                // If the caller intends to store claims along side the new users the caller must have ADMIN role.
+                if (!EnsureIsAdmin<LoginResponseModel>(out var oopsResponse))
+                    return oopsResponse;
+            }            
 
             var createUserResult = await UserManager.CreateAsync(newUser, model.Password);
             if (createUserResult.Succeeded)
