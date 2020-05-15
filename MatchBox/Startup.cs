@@ -104,10 +104,6 @@ namespace MatchBox
                     opt.UseSqlServer(connStr);
             });
 
-            // Key storage!
-            //services.AddDataProtection()
-            //        .PersistKeysToDbContext<MatchBoxDbContext>();
-
             services.AddIdentity<DbUser, DbRole>(options =>
                     {
                         options.Password.RequireLowercase = mbCfg.Password.RequireLowercase;

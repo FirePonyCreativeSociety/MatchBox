@@ -7,7 +7,6 @@ using MatchBox.Internal;
 using MatchBox.Models;
 using MatchBox.Services.Email;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -44,8 +43,7 @@ namespace MatchBox.Controllers
         public UserManager<DbUser> UserManager { get; }
         public SignInManager<DbUser> SignInManager { get; }
         public IEmailSender EmailSender { get; }
-        public IDataProtectionProvider Provider { get; }
-
+        
         public EmailConfiguration EmailConfiguration { get; }
 
         protected override IQueryable<DbUser> ControllerDbSet => DbContext.Users;

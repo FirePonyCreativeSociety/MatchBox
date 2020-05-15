@@ -29,7 +29,8 @@ namespace MatchBox.Controllers
         [HttpGet(nameof(GetSystemInformation))]
         public IActionResult GetSystemInformation()
         {
-            var keyLength = Configuration?.Security?.JwtIssuerSigningKey?.Length ?? 0;
+            var jwtKeyLength = Configuration?.Security?.JwtIssuerSigningKey?.Length ?? 0;
+            var adminKeyLengthPresent = !string.IsNullOrWhiteSpace(Configuration?.Security?.AdminKey);
 
             // Really cool way to send back a JSON object after building it anonymously right here!!!
             var result = new 
@@ -45,7 +46,8 @@ namespace MatchBox.Controllers
                     Configuration.Email?.Port,
                     Configuration.Email?.UseSSL,
                 },
-                JwtIssuerSigningKeyLength = keyLength,
+                JwtIssuerSigningKeyLength = jwtKeyLength,
+                AdminKeyPresent = adminKeyLengthPresent,
                 CurrentDateTime = DateTime.Now.ToString(CultureInfo.InvariantCulture),
             };
 
@@ -56,7 +58,7 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
-        public async Task<ActionResult<EmptyResult>> SendEmail(
+        public async Task<ActionResult> SendEmail(
             [FromBody] SendEmailModel model,
             [FromHeader(Name = Headers.AdminKey)] string adminKey)
         {

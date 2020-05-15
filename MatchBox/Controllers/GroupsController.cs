@@ -4,7 +4,6 @@ using MatchBox.Configuration;
 using MatchBox.Data;
 using MatchBox.Data.Models;
 using MatchBox.Models;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
