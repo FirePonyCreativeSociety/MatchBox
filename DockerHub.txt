@@ -2,9 +2,9 @@ https://www.softwaredeveloper.blog/multi-project-dotnet-core-solution-in-docker-
 
 -Open command prompt in the solution's directory then:
 
-	docker build -f MatchBox/DockerFile -t afederici1975/matchbox:1.0.1 .  	
+	docker build -f MatchBox/DockerFile -t afederici1975/matchbox:3.0.0 .  	
 	
-	docker push afederici1975/matchbox:1.0.1
+	docker push afederici1975/matchbox:3.0.0
 	docker push afederici1975/matchbox:latest
 	
 	docker run -d -p 18080:80 -p 18443:443 afederici1975/matchbox

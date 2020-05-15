@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Linq;
@@ -149,13 +150,13 @@ namespace MatchBox
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 #pragma warning disable CA1822 // Mark members as static
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 #pragma warning restore CA1822 // Mark members as static
         {
-            //if (env.IsDevelopment())
-            //{
-            //    app.UseDeveloperExceptionPage(); 
-            //}
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage(); 
+            }
 
             //app.UseHttpsRedirection();
             app.UseSwagger();
