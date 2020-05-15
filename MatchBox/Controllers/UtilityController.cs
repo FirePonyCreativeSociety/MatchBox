@@ -27,6 +27,7 @@ namespace MatchBox.Controllers
 
         [AllowAnonymous]
         [HttpGet(nameof(GetSystemInformation))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetSystemInformation()
         {
             var jwtKeyLength = Configuration?.Security?.JwtIssuerSigningKey?.Length ?? 0;
@@ -57,6 +58,7 @@ namespace MatchBox.Controllers
         [HttpPost(nameof(SendEmail))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 
         public async Task<ActionResult> SendEmail(
             [FromBody] SendEmailModel model,

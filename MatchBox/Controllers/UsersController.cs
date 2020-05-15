@@ -41,7 +41,7 @@ namespace MatchBox.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            
+
             var userResp = await UserManager.FindUserByUsernameOrEmail(model.UsernameOrEmail);
             if (!userResp.Found)
                 return NotFound();
@@ -70,8 +70,13 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public Task<ActionResult> UnlockUser([FromBody] UsernameOrEmailModel model)
+        public Task<ActionResult> UnlockUser(
+            [FromBody] UsernameOrEmailModel model,
+            [FromHeader(Name = Headers.AdminKey)] string adminKey)
         {
+            if (!CheckAdmin(adminKey))
+                return Task.FromResult<ActionResult>(Unauthorized());
+
             return LockUnlockUser(model, false);
         }
 
@@ -79,8 +84,13 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public Task<ActionResult> LockUser([FromBody] UsernameOrEmailModel model)
+        public Task<ActionResult> LockUser(
+            [FromBody] UsernameOrEmailModel model,
+            [FromHeader(Name = Headers.AdminKey)] string adminKey)
         {
+            if (!CheckAdmin(adminKey))
+                return Task.FromResult<ActionResult>(Unauthorized());
+
             return LockUnlockUser(model, true);
         }
 
@@ -88,8 +98,13 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> Delete([FromBody] UsernameOrEmailModel model)
+        public async Task<ActionResult> Delete(
+            [FromBody] UsernameOrEmailModel model,
+            [FromHeader(Name = Headers.AdminKey)] string adminKey)
         {
+            if (!CheckAdmin(adminKey))
+                return Unauthorized();
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -113,8 +128,13 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> Update([FromBody] UpdateUserModel model)
+        public async Task<ActionResult> Update(
+            [FromBody] UpdateUserModel model,
+            [FromHeader(Name = Headers.AdminKey)] string adminKey)
         {
+            if (!CheckAdmin(adminKey))
+                return Unauthorized();
+            
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -140,8 +160,13 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> AddClaimToUser([FromBody] AddClaimToUserModel model)
+        public async Task<ActionResult> AddClaimToUser(
+            [FromBody] AddClaimToUserModel model,
+            [FromHeader(Name = Headers.AdminKey)] string adminKey)
         {
+            if (!CheckAdmin(adminKey))
+                return Unauthorized();
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -168,8 +193,13 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> RemoveClaimFromUser([FromBody] RemoveClaimFromUserModel model)
+        public async Task<ActionResult> RemoveClaimFromUser(
+            [FromBody] RemoveClaimFromUserModel model,
+            [FromHeader(Name = Headers.AdminKey)] string adminKey)
         {
+            if (!CheckAdmin(adminKey))
+                return Unauthorized();
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
