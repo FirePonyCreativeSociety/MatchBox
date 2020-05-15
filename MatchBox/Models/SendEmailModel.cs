@@ -9,13 +9,11 @@ namespace MatchBox.API.Models
     public class SendEmailModel
     {
         [Required]
-        public string[] To { get; set; }
+        public IList<string> To { get; set; }
 
         [Required]
         public string Subject { get; set; }
         
-        public string Content { get; set; }
-        [Required]
-        public string AccessLevels { get; set; }
+        public string Content { get; set; }        
     }
 }

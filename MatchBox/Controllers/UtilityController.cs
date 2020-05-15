@@ -1,24 +1,20 @@
 ﻿using AutoMapper;
 using MatchBox.API.Models;
 using MatchBox.Configuration;
-using MatchBox.Internal;
 using MatchBox.Services.Email;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MatchBox.Controllers
 {
     public class UtilityController : MatchBoxControllerBase
     {
-        public UtilityController(MatchBoxConfiguration configuration, IDataProtectionProvider dataProtectionProvider, IEmailSender emailSender, IMapper mapper)
-            : base(dataProtectionProvider)
+        public UtilityController(SecurityConfiguration config, MatchBoxConfiguration configuration, IEmailSender emailSender, IMapper mapper)
+            : base(config)
         {
             Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             EmailSender = emailSender ?? throw new ArgumentNullException(nameof(emailSender));
@@ -60,14 +56,15 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
-        public async Task<ActionResult<EmptyResult>> SendEmail([FromBody] SendEmailModel model)
+        public async Task<ActionResult<EmptyResult>> SendEmail(
+            [FromBody] SendEmailModel model,
+            [FromHeader(Name = Headers.AdminKey)] string adminKey)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // If the caller intends to store claims along side the new users the caller must have ADMIN role.
-            if (!EnsureIsAdmin<EmptyResult>(out var oopsResponse))
-                return oopsResponse;
+            if (!CheckAdmin(adminKey))
+                return Unauthorized();
 
             var msg = new Message(model.To, model.Subject, model.Content);
             await EmailSender.SendEmailAsync(msg);

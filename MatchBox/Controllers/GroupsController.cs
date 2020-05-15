@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MatchBox.API.Models;
+using MatchBox.Configuration;
 using MatchBox.Data;
 using MatchBox.Data.Models;
 using MatchBox.Models;
@@ -14,8 +15,8 @@ namespace MatchBox.Controllers
 {
     public class GroupsController : RESTControllerBase<Group, DbGroup>
     {
-        public GroupsController(MatchBoxDbContext dbContext, IMapper mapper, IDataProtectionProvider dataProtectionProvider)
-            : base(dbContext, mapper, dataProtectionProvider)
+        public GroupsController(SecurityConfiguration config, MatchBoxDbContext dbContext, IMapper mapper)
+            : base(config, dbContext, mapper)
         {
 
         }

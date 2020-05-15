@@ -8,5 +8,7 @@ namespace MatchBox.Configuration
         public IReadOnlyCollection<string> CorsOrigins { get; set; }
         public string Issuer { get; set; } = "MatchBox";
         public string Audience  { get; set; }
+        
+        public string AdminKey { get; set; }        
     }    
 }

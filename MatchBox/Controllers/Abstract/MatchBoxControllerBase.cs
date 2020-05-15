@@ -1,14 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using MatchBox.Configuration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Org.BouncyCastle.Ocsp;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MatchBox.Controllers
 {
@@ -17,57 +12,33 @@ namespace MatchBox.Controllers
     [Route("api/[controller]")]
     public abstract class MatchBoxControllerBase : ControllerBase
     {
-        protected string Header_AccessLevel = Version.ProductNameNoSpacesFor("AccessLevel"); // MatchBox.AccessLevel
-        protected const string AccessLevel_Admin = "ADMIN";
-
-        protected MatchBoxControllerBase(IDataProtectionProvider dataProtectionProvider)
+        protected MatchBoxControllerBase(SecurityConfiguration config)
             : base()
         {
-            AdminProtector = dataProtectionProvider.CreateProtector(Version.ProductNameNoSpacesFor(Header_AccessLevel)) ?? throw new ArgumentNullException(nameof(dataProtectionProvider));
+            SystemConfiguration = config;            
         }
 
-        protected IDataProtector AdminProtector { get; }
+        protected SecurityConfiguration SystemConfiguration { get; }
 
-        protected bool EnsureIsAdmin<MODEL>(out ActionResult<MODEL> mandatoryResponse)
-            where MODEL : class
-        {            
-            return EnsureHasAccessLevel<MODEL>(AccessLevel_Admin, out mandatoryResponse);
-        }
-
-        protected bool EnsureHasAccessLevel<MODEL>(string requiredAccessLevelId, out ActionResult<MODEL> mandatoryResponse)
-            where MODEL : class
+        protected bool CheckAdmin(string adminKeyValue)
         {
-            if (requiredAccessLevelId == null)
-                throw new ArgumentNullException(nameof(requiredAccessLevelId));
-            
-            mandatoryResponse = default;
-
-            try
-            {                
-                if (!Request.Headers.TryGetValue(Header_AccessLevel, out var encryptedAccessLevels))
-                {
-                    mandatoryResponse = Unauthorized($"MISSING_HEADER_{Header_AccessLevel}");
-                    return false;
-                }
-
-                var legitAccessLevels = AdminProtector?.Unprotect(encryptedAccessLevels)
-                                                       .Split();
-                var hasLevel = legitAccessLevels.Contains(requiredAccessLevelId);
-                if (!hasLevel)
-                {
-                    mandatoryResponse = Unauthorized($"!{requiredAccessLevelId}");
-                    return false;
-                }
-
-                return true;
-            }
-            catch
-            {
-                mandatoryResponse = Unauthorized("BAD_KEY");
-
-                return false;
-            }
+            return CheckAdminWhen(() => true, adminKeyValue);
         }
 
+        protected bool CheckAdminWhen(bool check, string adminKeyValue)
+        {
+            return CheckAdminWhen(() => check, adminKeyValue);
+        }
+
+        protected bool CheckAdminWhen(Func<bool> check, string adminKeyValue)
+        {
+            if (check == null)
+                throw new ArgumentNullException(nameof(check));
+
+            if (!check())
+                return false;
+            else
+                return (adminKeyValue == SystemConfiguration.AdminKey);
+        }       
     }
 }

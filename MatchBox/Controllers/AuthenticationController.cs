@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MatchBox.API.Models;
+using MatchBox.Configuration;
 using MatchBox.Data;
 using MatchBox.Data.Models;
 using MatchBox.Internal;
@@ -27,11 +28,11 @@ namespace MatchBox.Controllers
             MatchBoxDbContext dbContext, 
             IMapper mapper, 
             IJwtProducer jwtProducer,
-            IDataProtectionProvider provider, 
+            SecurityConfiguration config,
             UserManager<DbUser> userManager,
             SignInManager<DbUser> signInManager,
             IEmailSender emailSender)
-            : base(dbContext, mapper, provider)
+            : base(config, dbContext, mapper)
         {
             JwtProducer = jwtProducer ?? throw new ArgumentNullException();
             UserManager = userManager;
@@ -69,7 +70,7 @@ namespace MatchBox.Controllers
             if (!signInResult.Succeeded)
                 return BadRequest(new { message = BadLoginMessage });
 
-            var jwt = JwtProducer.Generate(userLookup.Value);
+            //var jwt = JwtProducer.Generate(userLookup.Value);
 
             return Ok(new LoginResponseModel 
             { 
@@ -129,7 +130,9 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<LoginResponseModel>> RegisterNewUser([FromBody] RegisterNewUserModel model)
+        public async Task<ActionResult<LoginResponseModel>> RegisterNewUser(
+            [FromBody] RegisterNewUserModel model, 
+            [FromHeader(Name = Headers.AdminKey)] string adminKey)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -140,20 +143,10 @@ namespace MatchBox.Controllers
 
             var newUser = Mapper.Map<DbUser>(model);
 
-            // Greatly inspired by https://code-maze.com/data-protection-aspnet-core/
-
-            var tmpKey = "ZpeSOwV53XNn/HBsoWDRwiKk8LBususgRpT1y/OPT8Aq3+rPLTOJ7/Q6bl0QkyhPoOd2L8+daHo+pNhcUBhiOg==";
-            var testEncryptedUsingKey_permissionKey1 = AdminProtector.Protect($"ADMIN");
-            var testEncryptedUsingKey_permissionKey2 = AdminProtector.Protect($"ADMIXN");
-            var testEncryptedUsingKey_permissionKey3 = AdminProtector.Protect($"{AccessLevel_Admin}");
-
-            if ((newUser.Claims!= null) && newUser.Claims.Any())
-            {
-                // If the caller intends to store claims along side the new users the caller must have ADMIN role.
-                if (!EnsureIsAdmin<LoginResponseModel>(out var oopsResponse))
-                    return oopsResponse;
-            }            
-
+            var hasClaims = (newUser.Claims != null) && newUser.Claims.Any();
+            if (!CheckAdminWhen(hasClaims, adminKey))
+                return Unauthorized("Only admins can set claims.");
+                
             var createUserResult = await UserManager.CreateAsync(newUser, model.Password);
             if (createUserResult.Succeeded)
             {

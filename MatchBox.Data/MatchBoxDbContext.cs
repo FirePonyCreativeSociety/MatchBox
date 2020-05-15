@@ -1,6 +1,4 @@
 ﻿using MatchBox.Data.Models;
-using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,8 +7,7 @@ namespace MatchBox.Data
     public class MatchBoxDbContext : IdentityDbContext<
         DbUser, DbRole, int,
         DbUserClaim, DbUserRole, DbUserLogin,
-        DbRoleClaim, DbUserToken>,
-        IDataProtectionKeyContext
+        DbRoleClaim, DbUserToken>        
     {
         public const string DbConnectionName = "MatchBox";
         public const string AdminUserName = "admin";
@@ -30,8 +27,6 @@ namespace MatchBox.Data
         public DbSet<DbGroup> Groups { get; set; }
         public DbSet<DbUserGroup> UserGroups { get; set; }
         public DbSet<DbEvent> Events { get; set; }
-
-        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

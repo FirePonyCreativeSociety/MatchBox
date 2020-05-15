@@ -1,20 +1,18 @@
 ﻿using AutoMapper;
 using MatchBox.API.Models;
+using MatchBox.Configuration;
 using MatchBox.Data;
 using MatchBox.Data.Models;
 using MatchBox.Internal;
 using MatchBox.Models;
 using MatchBox.Services.Email;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using MatchBox.Internal;
-using System.Linq;
-using System.Threading.Tasks;
-using MatchBox.Data.Extensions;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.DataProtection;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MatchBox.Controllers
 {
@@ -24,11 +22,11 @@ namespace MatchBox.Controllers
     {        
         public UsersController(
             MatchBoxDbContext dbContext, 
-            IMapper mapper, 
+            IMapper mapper,
+            SecurityConfiguration config,
             UserManager<DbUser> userManager,
-            IEmailSender emailSender,
-            IDataProtectionProvider dataProtectionProvider)
-            : base(dbContext, mapper, dataProtectionProvider)
+            IEmailSender emailSender)
+            : base(config, dbContext, mapper)
         {
             UserManager = userManager;
             EmailSender = emailSender;
@@ -43,12 +41,7 @@ namespace MatchBox.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            if (!EnsureIsAdmin<EmptyResult>(out var mandatoryResponse))
-            {
-                return mandatoryResponse;
-            }
-
+            
             var userResp = await UserManager.FindUserByUsernameOrEmail(model.UsernameOrEmail);
             if (!userResp.Found)
                 return NotFound();
