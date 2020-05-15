@@ -70,6 +70,7 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public Task<ActionResult> UnlockUser(
             [FromBody] UsernameOrEmailModel model,
             [FromHeader(Name = Headers.AdminKey)] string adminKey)
@@ -84,6 +85,7 @@ namespace MatchBox.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public Task<ActionResult> LockUser(
             [FromBody] UsernameOrEmailModel model,
             [FromHeader(Name = Headers.AdminKey)] string adminKey)
@@ -96,8 +98,9 @@ namespace MatchBox.Controllers
 
         [HttpDelete()]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> Delete(
             [FromBody] UsernameOrEmailModel model,
             [FromHeader(Name = Headers.AdminKey)] string adminKey)
@@ -126,8 +129,9 @@ namespace MatchBox.Controllers
 
         [HttpPatch()]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]        
         public async Task<ActionResult> Update(
             [FromBody] UpdateUserModel model,
             [FromHeader(Name = Headers.AdminKey)] string adminKey)
@@ -158,8 +162,9 @@ namespace MatchBox.Controllers
 
         [HttpPost(nameof(AddClaimToUser))]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]        
         public async Task<ActionResult> AddClaimToUser(
             [FromBody] AddClaimToUserModel model,
             [FromHeader(Name = Headers.AdminKey)] string adminKey)
@@ -191,8 +196,8 @@ namespace MatchBox.Controllers
 
         [HttpPost(nameof(RemoveClaimFromUser))]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]        
         public async Task<ActionResult> RemoveClaimFromUser(
             [FromBody] RemoveClaimFromUserModel model,
             [FromHeader(Name = Headers.AdminKey)] string adminKey)

@@ -45,8 +45,11 @@ namespace MatchBox
             // Configure jwt authentication            
             // TODO: this is not the ideal place to check... or is it?
             if (string.IsNullOrWhiteSpace(mbCfg.Security.JwtIssuerSigningKey))
-                throw new Exception($"Unspecified Jwt IssuerSigningKey value in configuration.");
-            
+                throw new Exception($"{nameof(mbCfg.Security.JwtIssuerSigningKey)} missing in configuration.");
+
+            if (string.IsNullOrWhiteSpace(mbCfg.Security.AdminKey))
+                throw new Exception($"{nameof(mbCfg.Security.AdminKey)} missing in configuration.");
+
             var key = Encoding.ASCII.GetBytes(mbCfg.Security.JwtIssuerSigningKey);
             services.AddAuthentication(x =>
             {

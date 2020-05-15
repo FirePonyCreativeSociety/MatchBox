@@ -141,8 +141,8 @@ namespace MatchBox.Controllers
 
             var newUser = Mapper.Map<DbUser>(model);
 
-            var hasClaims = (newUser.Claims != null) && newUser.Claims.Any();
-            if (!CheckAdminWhen(hasClaims, adminKey))
+            var shouldCheck = (newUser.Claims != null) && newUser.Claims.Any();
+            if (!CheckAdminWhen(shouldCheck, adminKey))
                 return Unauthorized("Only admins can set claims.");
                 
             var createUserResult = await UserManager.CreateAsync(newUser, model.Password);

@@ -22,12 +22,14 @@ namespace MatchBox.Controllers
 
         protected bool CheckAdmin(string adminKeyValue)
         {
-            return CheckAdminWhen(() => true, adminKeyValue);
+            var res = CheckAdminWhen(() => true, adminKeyValue);
+            return res;
         }
 
         protected bool CheckAdminWhen(bool check, string adminKeyValue)
         {
-            return CheckAdminWhen(() => check, adminKeyValue);
+            var res = CheckAdminWhen(() => check, adminKeyValue);
+            return res;
         }
 
         protected bool CheckAdminWhen(Func<bool> check, string adminKeyValue)
@@ -35,10 +37,14 @@ namespace MatchBox.Controllers
             if (check == null)
                 throw new ArgumentNullException(nameof(check));
 
-            if (!check())
-                return false;
+            var shouldCheck = check();
+            if (shouldCheck)
+            {
+                var res = adminKeyValue == SystemConfiguration.AdminKey;
+                return res;
+            }
             else
-                return (adminKeyValue == SystemConfiguration.AdminKey);
+                return true;
         }       
     }
 }
