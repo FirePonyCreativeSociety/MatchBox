@@ -55,6 +55,7 @@ namespace MatchBox.Controllers
             return Ok(result);
         }
 
+        [AllowAnonymous]
         [HttpPost(nameof(SendEmail))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]        

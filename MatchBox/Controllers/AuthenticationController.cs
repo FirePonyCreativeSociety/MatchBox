@@ -93,7 +93,9 @@ namespace MatchBox.Controllers
 
             // https://code-maze.com/password-reset-aspnet-core-identity/        
             var candidateUser = await UserManager.FindUserByUsernameOrEmail(model.UsernameOrEmail);
-            
+            if (!candidateUser.Found)
+                return NotFound();
+
             return Ok(new ForgotPasswordResponse
             {
                 Email = candidateUser.Value.Email,
