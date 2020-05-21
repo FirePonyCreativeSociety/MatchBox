@@ -12,10 +12,10 @@ namespace MatchBox.Controllers
     [Route("api/[controller]")]
     public abstract class MatchBoxControllerBase : ControllerBase
     {
-        protected MatchBoxControllerBase(SecurityConfiguration config)
+        protected MatchBoxControllerBase(SecurityConfiguration securityConfig)
             : base()
         {
-            SystemConfiguration = config;            
+            SystemConfiguration = securityConfig;            
         }
 
         protected SecurityConfiguration SystemConfiguration { get; }

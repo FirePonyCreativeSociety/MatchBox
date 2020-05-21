@@ -54,6 +54,7 @@ namespace MatchBox.Tests
             // Adds logging?
             services.AddLogging(builder =>
             {
+                //
                 builder.AddConsole();
             });
             

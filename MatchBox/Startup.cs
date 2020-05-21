@@ -146,7 +146,7 @@ namespace MatchBox
             });
 
             services.AddTransient<IJwtProducer, JwtProducer>();
-            services.AddTransient<IEmailSender, EmailSender>();
+            services.AddTransient<IEmailSender, MimeKitEmailSender>();
 
             services.AddCors();
         }

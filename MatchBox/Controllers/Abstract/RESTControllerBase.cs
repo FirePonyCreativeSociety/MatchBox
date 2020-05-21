@@ -19,8 +19,8 @@ namespace MatchBox.Controllers
         where APIMODEL : class, IIntId, new()
         where DBMODEL : class, new()
     {
-        protected RESTControllerBase(SecurityConfiguration config, MatchBoxDbContext dbContext, IMapper mapper)
-            : base(config)
+        protected RESTControllerBase(SecurityConfiguration securityConfig, MatchBoxDbContext dbContext, IMapper mapper)
+            : base(securityConfig)
         {
             DbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));

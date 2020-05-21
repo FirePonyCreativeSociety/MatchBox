@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -27,19 +28,22 @@ namespace MatchBox.Controllers
             MatchBoxDbContext dbContext, 
             IMapper mapper, 
             IJwtProducer jwtProducer,
-            SecurityConfiguration config,
+            SecurityConfiguration securityConfig,
+            UserConfiguration userConfig,
             UserManager<DbUser> userManager,
             SignInManager<DbUser> signInManager,
             IEmailSender emailSender)
-            : base(config, dbContext, mapper)
+            : base(securityConfig, dbContext, mapper)
         {
             JwtProducer = jwtProducer ?? throw new ArgumentNullException();
+            UserConfig = userConfig;
             UserManager = userManager;
             SignInManager = signInManager;
             EmailSender = emailSender;            
         }
 
         public IJwtProducer JwtProducer { get; }
+        public UserConfiguration UserConfig { get; }
         public UserManager<DbUser> UserManager { get; }
         public SignInManager<DbUser> SignInManager { get; }
         public IEmailSender EmailSender { get; }
@@ -140,8 +144,26 @@ namespace MatchBox.Controllers
                 return Conflict(new { message = CredentialsAlreadyTaken });
 
             var newUser = Mapper.Map<DbUser>(model);
+            
+            if ((UserConfig.DefaultUserClaims != null) && (UserConfig.DefaultUserClaims.Any()))
+            {
+                var defClaims = UserConfig.DefaultUserClaims
+                                          .Split(';')
+                                          .Select(c => c.Split('='));
+                
+                newUser.Claims ??= new Collection<DbUserClaim>();
 
-            var shouldCheck = (newUser.Claims != null) && newUser.Claims.Any();
+                foreach (var defClaim in defClaims)
+                {
+                    newUser.Claims.Add(new DbUserClaim
+                    {
+                        ClaimType = defClaim.First().Trim(),
+                        ClaimValue = defClaim.Last().Trim()
+                    });
+                }
+            }
+
+            var shouldCheck = (model.Claims != null) && model.Claims.Any();
             if (!CheckAdminWhen(shouldCheck, adminKey))
                 return Unauthorized("Only admins can set claims.");
                 
