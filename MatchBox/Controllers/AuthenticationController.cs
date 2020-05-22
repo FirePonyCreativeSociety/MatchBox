@@ -113,7 +113,7 @@ namespace MatchBox.Controllers
                 return BadRequest(ModelState);
 
             var user = await UserManager.FindUserByUsernameOrEmail(model.Email);
-            if (user.Found)
+            if (!user.Found)
                 return NotFound();
 
             var resetPassResult = await UserManager.ResetPasswordAsync(user.Value, model.Token, model.NewPassword);
